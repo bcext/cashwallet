@@ -1772,7 +1772,7 @@ outputs:
 		_, addrs, _, _ := txscript.ExtractPkScriptAddrs(output.PkScript, net)
 		if len(addrs) == 1 {
 			addr := addrs[0]
-			address = addr.EncodeAddress()
+			address = btcutil.EncodeCashAddr(addr, net)
 			mgr, account, err := addrMgr.AddrAccount(addrmgrNs, addrs[0])
 			if err == nil {
 				accountName, err = mgr.AccountName(addrmgrNs, account)
@@ -2407,7 +2407,7 @@ func (w *Wallet) ListUnspent(minconf, maxconf int32,
 
 			if filter {
 				for _, addr := range addrs {
-					_, ok := addresses[addr.EncodeAddress()]
+					_, ok := addresses[btcutil.EncodeCashAddr(addr, w.ChainParams())]
 					if ok {
 						goto include
 					}
@@ -2466,7 +2466,7 @@ func (w *Wallet) ListUnspent(minconf, maxconf int32,
 			// addresses can be included, or removed (and the
 			// caller extracts addresses from the pkScript).
 			if len(addrs) > 0 {
-				result.Address = addrs[0].EncodeAddress()
+				result.Address = btcutil.EncodeCashAddr(addrs[0], w.ChainParams())
 			}
 
 			results = append(results, result)
@@ -2748,7 +2748,7 @@ func (w *Wallet) SortedActivePaymentAddresses() ([]string, error) {
 	err := walletdb.View(w.db, func(tx walletdb.ReadTx) error {
 		addrmgrNs := tx.ReadBucket(waddrmgrNamespaceKey)
 		return w.Manager.ForEachActiveAddress(addrmgrNs, func(addr btcutil.Address) error {
-			addrStrs = append(addrStrs, addr.EncodeAddress())
+			addrStrs = append(addrStrs, btcutil.EncodeCashAddr(addr, w.ChainParams()))
 			return nil
 		})
 	})
