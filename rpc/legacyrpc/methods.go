@@ -1599,10 +1599,25 @@ func signRawTransaction(icmd interface{}, w *wallet.Wallet, chainClient *chain.R
 		hashType = txscript.SigHashNone | txscript.SigHashAnyOneCanPay
 	case "SINGLE|ANYONECANPAY":
 		hashType = txscript.SigHashSingle | txscript.SigHashAnyOneCanPay
+	case "ALL|FORKID":
+		hashType = txscript.SigHashAll | txscript.SigHashForkID
+	case "NONE|FORKID":
+		hashType = txscript.SigHashNone | txscript.SigHashForkID
+	case "SINGLE|FORKID":
+		hashType = txscript.SigHashSingle | txscript.SigHashForkID
+	case "ALL|FORKID|ANYONECANPAY":
+		hashType = txscript.SigHashAll | txscript.SigHashForkID | txscript.SigHashAnyOneCanPay
+	case "NONE|FORKID|ANYONECANPAY":
+		hashType = txscript.SigHashNone | txscript.SigHashForkID | txscript.SigHashAnyOneCanPay
+	case "SINGLE|FORKID|ANYONECANPAY":
+		hashType = txscript.SigHashSingle | txscript.SigHashForkID | txscript.SigHashAnyOneCanPay
 	default:
 		e := errors.New("Invalid sighash parameter")
 		return nil, InvalidParameterError{e}
 	}
+
+	// ensure to be accepted by bitcoin-abc node after hardfork
+	hashType |= txscript.SigHashForkID
 
 	// TODO: really we probably should look these up with btcd anyway to
 	// make sure that they match the blockchain if present.
