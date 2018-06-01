@@ -45,7 +45,7 @@ func makeInputSource(eligible []wtxmgr.Credit) txauthor.InputSource {
 		for currentTotal < target && len(eligible) != 0 {
 			nextCredit := &eligible[0]
 			eligible = eligible[1:]
-			nextInput := wire.NewTxIn(&nextCredit.OutPoint, nil, nil)
+			nextInput := wire.NewTxIn(&nextCredit.OutPoint, nil)
 			currentTotal += nextCredit.Amount
 			currentInputs = append(currentInputs, nextInput)
 			currentScripts = append(currentScripts, nextCredit.PkScript)

@@ -368,7 +368,7 @@ func (tx *withdrawalTx) toMsgTx() *wire.MsgTx {
 	}
 
 	for _, i := range tx.inputs {
-		msgtx.AddTxIn(wire.NewTxIn(&i.OutPoint, []byte{}, nil))
+		msgtx.AddTxIn(wire.NewTxIn(&i.OutPoint, []byte{}))
 	}
 	return msgtx
 }
