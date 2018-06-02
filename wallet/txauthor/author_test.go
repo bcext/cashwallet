@@ -63,7 +63,7 @@ func TestNewUnsignedTransaction(t *testing.T) {
 			Outputs:        p2pkhOutputs(1e6),
 			RelayFee:       1e3,
 			ChangeAmount: 1e8 - 1e6 - txrules.FeeForSerializeSize(1e3,
-				txsizes.EstimateVirtualSize(1, 0, 0, p2pkhOutputs(1e6), true)),
+				txsizes.EstimateVirtualSize(1, p2pkhOutputs(1e6), true)),
 			InputCount: 1,
 		},
 		2: {
@@ -71,7 +71,7 @@ func TestNewUnsignedTransaction(t *testing.T) {
 			Outputs:        p2pkhOutputs(1e6),
 			RelayFee:       1e4,
 			ChangeAmount: 1e8 - 1e6 - txrules.FeeForSerializeSize(1e4,
-				txsizes.EstimateVirtualSize(1, 0, 0, p2pkhOutputs(1e6), true)),
+				txsizes.EstimateVirtualSize(1, p2pkhOutputs(1e6), true)),
 			InputCount: 1,
 		},
 		3: {
@@ -79,7 +79,7 @@ func TestNewUnsignedTransaction(t *testing.T) {
 			Outputs:        p2pkhOutputs(1e6, 1e6, 1e6),
 			RelayFee:       1e4,
 			ChangeAmount: 1e8 - 3e6 - txrules.FeeForSerializeSize(1e4,
-				txsizes.EstimateVirtualSize(1, 0, 0, p2pkhOutputs(1e6, 1e6, 1e6), true)),
+				txsizes.EstimateVirtualSize(1, p2pkhOutputs(1e6, 1e6, 1e6), true)),
 			InputCount: 1,
 		},
 		4: {
@@ -87,7 +87,7 @@ func TestNewUnsignedTransaction(t *testing.T) {
 			Outputs:        p2pkhOutputs(1e6, 1e6, 1e6),
 			RelayFee:       2.55e3,
 			ChangeAmount: 1e8 - 3e6 - txrules.FeeForSerializeSize(2.55e3,
-				txsizes.EstimateVirtualSize(1, 0, 0, p2pkhOutputs(1e6, 1e6, 1e6), true)),
+				txsizes.EstimateVirtualSize(1, p2pkhOutputs(1e6, 1e6, 1e6), true)),
 			InputCount: 1,
 		},
 
@@ -95,7 +95,7 @@ func TestNewUnsignedTransaction(t *testing.T) {
 		5: {
 			UnspentOutputs: p2pkhOutputs(1e8),
 			Outputs: p2pkhOutputs(1e8 - 545 - txrules.FeeForSerializeSize(1e3,
-				txsizes.EstimateVirtualSize(1, 0, 0, p2pkhOutputs(0), true))),
+				txsizes.EstimateVirtualSize(1, p2pkhOutputs(0), true))),
 			RelayFee:     1e3,
 			ChangeAmount: 545,
 			InputCount:   1,
@@ -103,7 +103,7 @@ func TestNewUnsignedTransaction(t *testing.T) {
 		6: {
 			UnspentOutputs: p2pkhOutputs(1e8),
 			Outputs: p2pkhOutputs(1e8 - 546 - txrules.FeeForSerializeSize(1e3,
-				txsizes.EstimateVirtualSize(1, 0, 0, p2pkhOutputs(0), true))),
+				txsizes.EstimateVirtualSize(1, p2pkhOutputs(0), true))),
 			RelayFee:     1e3,
 			ChangeAmount: 546,
 			InputCount:   1,
@@ -113,7 +113,7 @@ func TestNewUnsignedTransaction(t *testing.T) {
 		7: {
 			UnspentOutputs: p2pkhOutputs(1e8),
 			Outputs: p2pkhOutputs(1e8 - 1392 - txrules.FeeForSerializeSize(2.55e3,
-				txsizes.EstimateVirtualSize(1, 0, 0, p2pkhOutputs(0), true))),
+				txsizes.EstimateVirtualSize(1, p2pkhOutputs(0), true))),
 			RelayFee:     2.55e3,
 			ChangeAmount: 1392,
 			InputCount:   1,
@@ -121,7 +121,7 @@ func TestNewUnsignedTransaction(t *testing.T) {
 		8: {
 			UnspentOutputs: p2pkhOutputs(1e8),
 			Outputs: p2pkhOutputs(1e8 - 1393 - txrules.FeeForSerializeSize(2.55e3,
-				txsizes.EstimateVirtualSize(1, 0, 0, p2pkhOutputs(0), true))),
+				txsizes.EstimateVirtualSize(1, p2pkhOutputs(0), true))),
 			RelayFee:     2.55e3,
 			ChangeAmount: 1393,
 			InputCount:   1,
@@ -133,7 +133,7 @@ func TestNewUnsignedTransaction(t *testing.T) {
 		9: {
 			UnspentOutputs: p2pkhOutputs(1e8, 1e8),
 			Outputs: p2pkhOutputs(1e8 - 546 - txrules.FeeForSerializeSize(1e3,
-				txsizes.EstimateVirtualSize(1, 0, 0, p2pkhOutputs(0), true))),
+				txsizes.EstimateVirtualSize(1, p2pkhOutputs(0), true))),
 			RelayFee:     1e3,
 			ChangeAmount: 546,
 			InputCount:   1,
@@ -147,7 +147,7 @@ func TestNewUnsignedTransaction(t *testing.T) {
 		10: {
 			UnspentOutputs: p2pkhOutputs(1e8, 1e8),
 			Outputs: p2pkhOutputs(1e8 - 545 - txrules.FeeForSerializeSize(1e3,
-				txsizes.EstimateVirtualSize(1, 0, 0, p2pkhOutputs(0), true))),
+				txsizes.EstimateVirtualSize(1, p2pkhOutputs(0), true))),
 			RelayFee:     1e3,
 			ChangeAmount: 545,
 			InputCount:   1,
@@ -159,7 +159,7 @@ func TestNewUnsignedTransaction(t *testing.T) {
 			Outputs:        p2pkhOutputs(1e8),
 			RelayFee:       1e3,
 			ChangeAmount: 1e8 - txrules.FeeForSerializeSize(1e3,
-				txsizes.EstimateVirtualSize(2, 0, 0, p2pkhOutputs(1e8), true)),
+				txsizes.EstimateVirtualSize(2, p2pkhOutputs(1e8), true)),
 			InputCount: 2,
 		},
 
