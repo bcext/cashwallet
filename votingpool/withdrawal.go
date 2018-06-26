@@ -873,8 +873,8 @@ func getRawSigs(transactions []*withdrawalTx) (map[Ntxid]TxSigs, error) {
 					}
 					log.Debugf("Generating raw sig for input %d of tx %s with privkey of %s",
 						inputIdx, ntxid, pubKey.String())
-					sig, err = txscript.RawTxInSignature(
-						msgtx, inputIdx, redeemScript, txscript.SigHashAll, ecPrivKey)
+					sig, err = txscript.RawTxInSignature(msgtx, inputIdx, redeemScript, 0, // TODO:Comfirm amount
+						txscript.SigHashAll|txscript.SigHashForkID, ecPrivKey)
 					if err != nil {
 						return nil, newError(ErrRawSigning, "failed to generate raw signature", err)
 					}
