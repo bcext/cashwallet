@@ -982,6 +982,7 @@ func signMultiSigUTXO(mgr *waddrmgr.Manager, addrmgrNs walletdb.ReadBucket, tx *
 // validateSigScripts executes the signature script of the tx input with the
 // given index, returning an error if it fails.
 func validateSigScript(msgtx *wire.MsgTx, idx int, pkScript []byte) error {
+	// todo: verifyScriptFlags needs to cover MagneticAnomalyActivation
 	vm, err := txscript.NewEngine(pkScript, msgtx, idx,
 		txscript.StandardVerifyFlags, nil, nil, 0)
 	if err != nil {

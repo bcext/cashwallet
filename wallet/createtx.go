@@ -109,6 +109,9 @@ func (w *Wallet) txToOutputs(outputs []*wire.TxOut, account uint32,
 		return nil, err
 	}
 
+	// validateMsgTx(...) needed ScriptVerifyFlags
+	scriptFlags := txscript.StandardVerifyFlags
+
 	err = walletdb.Update(w.db, func(dbtx walletdb.ReadWriteTx) error {
 		addrmgrNs := dbtx.ReadWriteBucket(waddrmgrNamespaceKey)
 
@@ -116,6 +119,9 @@ func (w *Wallet) txToOutputs(outputs []*wire.TxOut, account uint32,
 		bs, err := chainClient.BlockStamp()
 		if err != nil {
 			return err
+		}
+		if bs.Height >= w.chainParams.MonolithActivationHeight {
+			scriptFlags |= txscript.ScriptEnableMonolith
 		}
 
 		eligible, err := w.findEligibleOutputs(dbtx, account, minconf, bs)
@@ -159,7 +165,7 @@ func (w *Wallet) txToOutputs(outputs []*wire.TxOut, account uint32,
 		return nil, err
 	}
 
-	err = validateMsgTx(tx.Tx, tx.PrevScripts, tx.PrevInputValues)
+	err = validateMsgTx(tx.Tx, tx.PrevScripts, tx.PrevInputValues, scriptFlags)
 	if err != nil {
 		return nil, err
 	}
@@ -231,11 +237,11 @@ func (w *Wallet) findEligibleOutputs(dbtx walletdb.ReadTx, account uint32, minco
 // validateMsgTx verifies transaction input scripts for tx.  All previous output
 // scripts from outputs redeemed by the transaction, in the same order they are
 // spent, must be passed in the prevScripts slice.
-func validateMsgTx(tx *wire.MsgTx, prevScripts [][]byte, inputValues []btcutil.Amount) error {
+func validateMsgTx(tx *wire.MsgTx, prevScripts [][]byte, inputValues []btcutil.Amount, flags txscript.ScriptFlags) error {
 	hashCache := txscript.NewTxSigHashes(tx)
 	for i, prevScript := range prevScripts {
 		vm, err := txscript.NewEngine(prevScript, tx, i,
-			txscript.StandardVerifyFlags, nil, hashCache, int64(inputValues[i]))
+			flags, nil, hashCache, int64(inputValues[i]))
 		if err != nil {
 			return fmt.Errorf("cannot create script engine: %s", err)
 		}

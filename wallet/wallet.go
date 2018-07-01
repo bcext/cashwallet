@@ -3074,12 +3074,22 @@ func (w *Wallet) SignTransaction(tx *wire.MsgTx, hashType txscript.SigHashType,
 	additionalKeysByAddress map[string]*btcutil.WIF,
 	p2shRedeemScriptsByAddress map[string][]byte) ([]SignatureError, error) {
 
+	scriptFlags := txscript.StandardVerifyFlags
+	_, height, err := w.chainClient.GetBestBlock()
+	if err != nil {
+		return nil, errors.New("RPC request best block failed:" + err.Error())
+	}
+	if height >= w.chainParams.MonolithActivationHeight {
+		scriptFlags |= txscript.ScriptEnableMonolith
+	}
+
 	var signErrors []SignatureError
-	err := walletdb.View(w.db, func(dbtx walletdb.ReadTx) error {
+	err = walletdb.View(w.db, func(dbtx walletdb.ReadTx) error {
 		addrmgrNs := dbtx.ReadBucket(waddrmgrNamespaceKey)
 		txmgrNs := dbtx.ReadBucket(wtxmgrNamespaceKey)
 
 		for i, txIn := range tx.TxIn {
+			var inputAmount int64
 			prevOutScript, ok := additionalPrevScripts[txIn.PreviousOutPoint]
 			if !ok {
 				prevHash := &txIn.PreviousOutPoint.Hash
@@ -3094,6 +3104,7 @@ func (w *Wallet) SignTransaction(tx *wire.MsgTx, hashType txscript.SigHashType,
 						txIn.PreviousOutPoint)
 				}
 				prevOutScript = txDetails.MsgTx.TxOut[prevIndex].PkScript
+				inputAmount = txDetails.MsgTx.TxOut[prevIndex].Value
 			}
 
 			// Set up our callbacks that we pass to txscript so it can
@@ -3173,8 +3184,11 @@ func (w *Wallet) SignTransaction(tx *wire.MsgTx, hashType txscript.SigHashType,
 
 			// Either it was already signed or we just signed it.
 			// Find out if it is completely satisfied or still needs more.
-			vm, err := txscript.NewEngine(prevOutScript, tx, i,
-				txscript.StandardVerifyFlags, nil, nil, 0)
+			if err != nil {
+
+			}
+			vm, err := txscript.NewEngine(prevOutScript, tx, i, scriptFlags,
+				nil, nil, inputAmount)
 			if err == nil {
 				err = vm.Execute()
 			}
