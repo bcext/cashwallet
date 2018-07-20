@@ -122,14 +122,14 @@ func NewUnsignedTransaction(outputs []*wire.TxOut, relayFeePerKb btcutil.Amount,
 		changeIndex := -1
 		changeAmount := inputAmount - targetAmount - maxRequiredFee
 		if changeAmount != 0 && !txrules.IsDustAmount(changeAmount,
-			txsizes.P2WPKHPkScriptSize, relayFeePerKb) {
+			txsizes.P2PKHPkScriptSize, relayFeePerKb) {
 			changeScript, err := fetchChange()
 			if err != nil {
 				return nil, err
 			}
-			if len(changeScript) > txsizes.P2WPKHPkScriptSize {
+			if len(changeScript) > txsizes.P2PKHPkScriptSize {
 				return nil, errors.New("fee estimation requires change " +
-					"scripts no larger than P2WPKH output scripts")
+					"scripts no larger than P2PKH output scripts")
 			}
 			change := wire.NewTxOut(int64(changeAmount), changeScript)
 			l := len(outputs)
@@ -199,8 +199,8 @@ func AddAllInputScripts(tx *wire.MsgTx, prevPkScripts [][]byte, inputValues []bt
 		pkScript := prevPkScripts[i]
 
 		sigScript := inputs[i].SignatureScript
-		script, err := txscript.SignTxOutput(chainParams, tx, i,
-			pkScript, txscript.SigHashAll|txscript.SigHashForkID, secrets, secrets,
+		script, err := txscript.SignTxOutput(chainParams, tx, i, pkScript,
+			txscript.SigHashAll|txscript.SigHashForkID, inputValues[i], secrets, secrets,
 			sigScript)
 		if err != nil {
 			return err

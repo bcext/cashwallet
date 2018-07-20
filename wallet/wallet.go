@@ -3168,8 +3168,8 @@ func (w *Wallet) SignTransaction(tx *wire.MsgTx, hashType txscript.SigHashType,
 			if (hashType&txscript.SigHashSingle) !=
 				txscript.SigHashSingle || i < len(tx.TxOut) {
 
-				script, err := txscript.SignTxOutput(w.ChainParams(),
-					tx, i, prevOutScript, hashType, getKey,
+				script, err := txscript.SignTxOutput(w.ChainParams(), tx, i,
+					prevOutScript, hashType, btcutil.Amount(inputAmount), getKey,
 					getScript, txIn.SignatureScript)
 				// Failure to sign isn't an error, it just means that
 				// the tx isn't complete.

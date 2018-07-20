@@ -9,10 +9,9 @@ import (
 
 	"github.com/btcsuite/btcd/wire"
 	"github.com/btcsuite/btcutil"
+	"github.com/btcsuite/btcwallet/wallet/internal/txsizes"
 	. "github.com/btcsuite/btcwallet/wallet/txauthor"
 	"github.com/btcsuite/btcwallet/wallet/txrules"
-
-	"github.com/btcsuite/btcwallet/wallet/internal/txsizes"
 )
 
 func p2pkhOutputs(amounts ...btcutil.Amount) []*wire.TxOut {
@@ -97,7 +96,7 @@ func TestNewUnsignedTransaction(t *testing.T) {
 			Outputs: p2pkhOutputs(1e8 - 545 - txrules.FeeForSerializeSize(1e3,
 				txsizes.EstimateVirtualSize(1, p2pkhOutputs(0), true))),
 			RelayFee:     1e3,
-			ChangeAmount: 545,
+			ChangeAmount: 0,
 			InputCount:   1,
 		},
 		6: {
@@ -149,7 +148,7 @@ func TestNewUnsignedTransaction(t *testing.T) {
 			Outputs: p2pkhOutputs(1e8 - 545 - txrules.FeeForSerializeSize(1e3,
 				txsizes.EstimateVirtualSize(1, p2pkhOutputs(0), true))),
 			RelayFee:     1e3,
-			ChangeAmount: 545,
+			ChangeAmount: 0,
 			InputCount:   1,
 		},
 
@@ -176,7 +175,7 @@ func TestNewUnsignedTransaction(t *testing.T) {
 
 	changeSource := func() ([]byte, error) {
 		// Only length matters for these tests.
-		return make([]byte, txsizes.P2WPKHPkScriptSize), nil
+		return make([]byte, txsizes.P2PKHPkScriptSize), nil
 	}
 
 	for i, test := range tests {
