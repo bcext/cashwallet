@@ -2051,8 +2051,8 @@ func TestScopedKeyManagerManagement(t *testing.T) {
 		Coin:    0,
 	}
 	addrSchema := waddrmgr.ScopeAddrSchema{
-		ExternalAddrType: waddrmgr.NestedWitnessPubKey,
-		InternalAddrType: waddrmgr.WitnessPubKey,
+		ExternalAddrType: waddrmgr.PubKeyHash,
+		InternalAddrType: waddrmgr.PubKeyHash,
 	}
 	var scopedMgr *waddrmgr.ScopedKeyManager
 	err = walletdb.Update(db, func(tx walletdb.ReadWriteTx) error {
@@ -2078,7 +2078,6 @@ func TestScopedKeyManagerManagement(t *testing.T) {
 	var externalAddr, internalAddr []waddrmgr.ManagedAddress
 	err = walletdb.Update(db, func(tx walletdb.ReadWriteTx) error {
 		ns := tx.ReadWriteBucket(waddrmgrNamespaceKey)
-
 		// We'll now create a new external address to ensure we
 		// retrieve the proper type.
 		externalAddr, err = scopedMgr.NextExternalAddresses(
@@ -2101,22 +2100,22 @@ func TestScopedKeyManagerManagement(t *testing.T) {
 	}
 
 	// Ensure that the type of the address matches as expected.
-	if externalAddr[0].AddrType() != waddrmgr.NestedWitnessPubKey {
+	if externalAddr[0].AddrType() != waddrmgr.PubKeyHash {
 		t.Fatalf("addr type mismatch: expected %v, got %v",
-			waddrmgr.NestedWitnessPubKey, externalAddr[0].AddrType())
+			waddrmgr.PubKeyHash, externalAddr[0].AddrType())
 	}
-	_, ok := externalAddr[0].Address().(*btcutil.AddressScriptHash)
+	_, ok := externalAddr[0].Address().(*btcutil.AddressPubKeyHash)
 	if !ok {
 		t.Fatalf("wrong type: %T", externalAddr[0].Address())
 	}
 
 	// We'll also create an internal address and ensure that the types
 	// match up properly.
-	if internalAddr[0].AddrType() != waddrmgr.WitnessPubKey {
+	if internalAddr[0].AddrType() != waddrmgr.PubKeyHash {
 		t.Fatalf("addr type mismatch: expected %v, got %v",
-			waddrmgr.WitnessPubKey, internalAddr[0].AddrType())
+			waddrmgr.PubKeyHash, internalAddr[0].AddrType())
 	}
-	_, ok = internalAddr[0].Address().(*btcutil.AddressWitnessPubKeyHash)
+	_, ok = internalAddr[0].Address().(*btcutil.AddressPubKeyHash)
 	if !ok {
 		t.Fatalf("wrong type: %T", externalAddr[0].Address())
 	}
@@ -2245,8 +2244,8 @@ func TestRootHDKeyNeutering(t *testing.T) {
 		Coin:    0,
 	}
 	addrSchema := waddrmgr.ScopeAddrSchema{
-		ExternalAddrType: waddrmgr.NestedWitnessPubKey,
-		InternalAddrType: waddrmgr.WitnessPubKey,
+		ExternalAddrType: waddrmgr.PubKeyHash,
+		InternalAddrType: waddrmgr.PubKeyHash,
 	}
 	err = walletdb.Update(db, func(tx walletdb.ReadWriteTx) error {
 		ns := tx.ReadWriteBucket(waddrmgrNamespaceKey)
@@ -2334,9 +2333,9 @@ func TestNewRawAccount(t *testing.T) {
 
 	// Now that we have the manager created, we'll fetch one of the default
 	// scopes for usage within this test.
-	scopedMgr, err := mgr.FetchScopedKeyManager(waddrmgr.KeyScopeBIP0084)
+	scopedMgr, err := mgr.FetchScopedKeyManager(waddrmgr.KeyScopeBIP0044)
 	if err != nil {
-		t.Fatalf("unable to fetch scope %v: %v", waddrmgr.KeyScopeBIP0084, err)
+		t.Fatalf("unable to fetch scope %v: %v", waddrmgr.KeyScopeBIP0044, err)
 	}
 
 	// With the scoped manager retrieved, we'll attempt to create a new raw

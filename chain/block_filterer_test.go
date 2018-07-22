@@ -274,8 +274,8 @@ func TestBlockFiltererOneInOneOut(t *testing.T) {
 	// Add each of their single previous outpoints to the set of watched
 	// outpoints to filter for.
 	watchedOutPoints := make(map[wire.OutPoint]btcutil.Address)
-	watchedOutPoints[firstTx.TxIn[0].PreviousOutPoint] = &btcutil.AddressWitnessPubKeyHash{}
-	watchedOutPoints[lastTx.TxIn[0].PreviousOutPoint] = &btcutil.AddressWitnessPubKeyHash{}
+	watchedOutPoints[firstTx.TxIn[0].PreviousOutPoint] = &btcutil.AddressPubKeyHash{}
+	watchedOutPoints[lastTx.TxIn[0].PreviousOutPoint] = &btcutil.AddressPubKeyHash{}
 
 	// Construct a filter request, watching only for the outpoints above,
 	// and construct a block filterer.

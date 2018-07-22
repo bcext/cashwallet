@@ -10,7 +10,6 @@ import (
 	"sync"
 
 	"github.com/btcsuite/btcd/btcec"
-	"github.com/btcsuite/btcd/txscript"
 	"github.com/btcsuite/btcutil"
 	"github.com/btcsuite/btcutil/hdkeychain"
 	"github.com/btcsuite/btcwallet/internal/zero"
@@ -35,18 +34,6 @@ const (
 	// type indicates that a scoped manager with this address type
 	// shouldn't be consulted during historical rescans.
 	RawPubKey
-
-	// NestedWitnessPubKey represents a p2wkh output nested within a p2sh
-	// output. Using this address type, the wallet can receive funds from
-	// other wallet's which don't yet recognize the new segwit standard
-	// output types. Receiving funds to this address maintains the
-	// scalability, and malleability fixes due to segwit in a backwards
-	// compatible manner.
-	NestedWitnessPubKey
-
-	// WitnessPubKey represents a p2wkh (pay-to-witness-key-hash) address
-	// type.
-	WitnessPubKey
 )
 
 // ManagedAddress is an interface that provides acces to information regarding
@@ -205,8 +192,6 @@ func (a *managedAddress) AddrHash() []byte {
 		hash = n.Hash160()[:]
 	case *btcutil.AddressScriptHash:
 		hash = n.Hash160()[:]
-	case *btcutil.AddressWitnessPubKeyHash:
-		hash = n.Hash160()[:]
 	}
 
 	return hash
@@ -327,50 +312,8 @@ func newManagedAddressWithoutPrivKey(m *ScopedKeyManager, account uint32, pubKey
 	var address btcutil.Address
 	var err error
 
-	switch addrType {
-
-	case NestedWitnessPubKey:
-		// For this address type we'l generate an address which is
-		// backwards compatible to Bitcoin nodes running 0.6.0 onwards, but
-		// allows us to take advantage of segwit's scripting improvments,
-		// and malleability fixes.
-
-		// First, we'll generate a normal p2wkh address from the pubkey hash.
-		witAddr, err := btcutil.NewAddressWitnessPubKeyHash(
-			pubKeyHash, m.rootManager.chainParams,
-		)
-		if err != nil {
-			return nil, err
-		}
-
-		// Next we'll generate the witness program which can be used as a
-		// pkScript to pay to this generated address.
-		witnessProgram, err := txscript.PayToAddrScript(witAddr)
-		if err != nil {
-			return nil, err
-		}
-
-		// Finally, we'll use the witness program itself as the pre-image
-		// to a p2sh address. In order to spend, we first use the
-		// witnessProgram as the sigScript, then present the proper
-		// <sig, pubkey> pair as the witness.
-		address, err = btcutil.NewAddressScriptHash(
-			witnessProgram, m.rootManager.chainParams,
-		)
-		if err != nil {
-			return nil, err
-		}
-
-	case PubKeyHash:
+	if addrType == PubKeyHash {
 		address, err = btcutil.NewAddressPubKeyHash(
-			pubKeyHash, m.rootManager.chainParams,
-		)
-		if err != nil {
-			return nil, err
-		}
-
-	case WitnessPubKey:
-		address, err = btcutil.NewAddressWitnessPubKeyHash(
 			pubKeyHash, m.rootManager.chainParams,
 		)
 		if err != nil {
