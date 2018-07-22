@@ -2168,26 +2168,6 @@ func upgradeManager(db walletdb.DB, namespaceKey []byte, pubPassPhrase []byte,
 // keys on disk. However, using the BIP0044 key scope, users will still be able
 // to create old p2pkh addresses.
 func upgradeToVersion5(ns walletdb.ReadWriteBucket, pubPassPhrase []byte) error {
-	// First, we'll check if there are any existing segwit addresses, which
-	// can't be upgraded to the new version. If so, we abort and warn the
-	// user.
-	err := ns.NestedReadBucket(addrBucketName).ForEach(
-		func(k []byte, v []byte) error {
-			row, err := deserializeAddressRow(v)
-			if err != nil {
-				return err
-			}
-			if row.addrType > adtScript {
-				return fmt.Errorf("segwit address exists in " +
-					"wallet, can't upgrade from v4 to " +
-					"v5: well, we tried  ¯\\_(ツ)_/¯")
-			}
-			return nil
-		})
-	if err != nil {
-		return err
-	}
-
 	// Next, we'll write out the new database version.
 	if err := putManagerVersion(ns, 5); err != nil {
 		return err
