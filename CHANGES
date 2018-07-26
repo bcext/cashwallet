@@ -183,7 +183,7 @@ Changes in 0.5.0 (Tue Mar 03 2015)
       (--create) to create a new walletdb-backed wallet file and import keys
       from the old Armory wallet file (if any)
     - Transaction creation changes:
-      - Drop default transaction fee to 0.00001 BTC per kB
+      - Drop default transaction fee to 0.00001 BCH per kB
       - Use standard script flags provided by the txscript package for
         transaction creation and sanity checking
       - Randomize change output index
