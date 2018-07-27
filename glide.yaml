@@ -1,8 +1,8 @@
-package: github.com/btcsuite/btcwallet
+package: github.com/bcext/cashwallet
 import:
 - package: github.com/coreos/bbolt
   version: 4f5275f4ebbf6fe7cb772de987fa96ee674460a7
-- package: github.com/btcsuite/btcd
+- package: github.com/bcext/gcash
   version: fdfc19097e7ac6b57035062056f5b7b4638b8898
   subpackages:
   - blockchain
@@ -13,11 +13,11 @@ import:
   - txscript
   - wire
 - package: github.com/btcsuite/btclog
-- package: github.com/btcsuite/btcutil
+- package: github.com/bcext/cashutil
   version: ab6388e0c60ae4834a1f57511e20c17b5f78be4b
   subpackages:
   - hdkeychain
-- package: github.com/lightninglabs/neutrino
+- package: github.com/bcext/neutrino
   version: 8401b99f3f0698bc6aa26c3d702dd583e51f70c2
 - package: github.com/btcsuite/golangcrypto
   subpackages:

@@ -15,7 +15,7 @@ each.  In short summary, to call RPC server methods, a client must:
 
 The only exception to these steps is if the client is being written in Go.  In
 that case, the first step may be omitted by importing the bindings from
-btcwallet itself.
+cashwallet itself.
 
 The rest of this document provides short examples of how to quickly get started
 by implementing a basic client that fetches the balance of the default account
@@ -52,15 +52,15 @@ import (
 	"fmt"
 	"path/filepath"
 
-	pb "github.com/btcsuite/btcwallet/rpc/walletrpc"
+	pb "github.com/bcext/cashwallet/rpc/walletrpc"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
-	"github.com/btcsuite/btcutil"
+	"github.com/bcext/cashutil"
 )
 
-var certificateFile = filepath.Join(btcutil.AppDataDir("btcwallet", false), "rpc.cert")
+var certificateFile = filepath.Join(cashutil.AppDataDir("cashwallet", false), "rpc.cert")
 
 func main() {
 	creds, err := credentials.NewClientTLSFromFile(certificateFile, "localhost")
@@ -86,7 +86,7 @@ func main() {
 		return
 	}
 
-	fmt.Println("Spendable balance: ", btcutil.Amount(balanceResponse.Spendable))
+	fmt.Println("Spendable balance: ", cashutil.Amount(balanceResponse.Spendable))
 }
 ```
 
@@ -103,9 +103,9 @@ example source code) with a source gRPC install in `/usr/local`.
 First, generate the C++ language bindings by compiling the `.proto`:
 
 ```bash
-$ protoc -I/path/to/btcwallet/rpc --cpp_out=. --grpc_out=. \
+$ protoc -I/path/to/cashwallet/rpc --cpp_out=. --grpc_out=. \
   --plugin=protoc-gen-grpc=$(which grpc_cpp_plugin) \
-  /path/to/btcwallet/rpc/api.proto
+  /path/to/cashwallet/rpc/api.proto
 ```
 
 Once the `.proto` file has been compiled, the example client can be completed.
@@ -145,7 +145,7 @@ auto read_file(std::string const& file_path) -> std::string {
 auto main() -> int {
     // Before the gRPC native library (gRPC Core) is lazily loaded and
     // initialized, an environment variable must be set so BoringSSL is
-    // configured to use ECDSA TLS certificates (required by btcwallet).
+    // configured to use ECDSA TLS certificates (required by cashwallet).
     setenv("GRPC_SSL_CIPHER_SUITES", "HIGH+ECDSA", 1);
 
     // Note: This path is operating system-dependent.  This can be created
@@ -156,7 +156,7 @@ auto main() -> int {
         if (pw == nullptr || pw->pw_dir == nullptr) {
             throw NoHomeDirectoryException{};
         }
-        return pw->pw_dir + "/.btcwallet/rpc.cert"s;
+        return pw->pw_dir + "/.cashwallet/rpc.cert"s;
     }();
 
     grpc::SslCredentialsOptions cred_options{
@@ -216,9 +216,9 @@ generated.  The following command generates the files `Api.cs` and `ApiGrpc.cs`
 in the `Example` project directory using the `Walletrpc` namespace:
 
 ```PowerShell
-PS> & protoc.exe -I \Path\To\btcwallet\rpc --csharp_out=Example --grpc_out=Example `
+PS> & protoc.exe -I \Path\To\cashwallet\rpc --csharp_out=Example --grpc_out=Example `
     --plugin=protoc-gen-grpc=\Path\To\grpc_csharp_plugin.exe `
-    \Path\To\btcwallet\rpc\api.proto
+    \Path\To\cashwallet\rpc\api.proto
 ```
 
 Once references have been added to the project for the `Google.Protobuf` and
@@ -245,7 +245,7 @@ namespace Example
         {
             // Before the gRPC native library (gRPC Core) is lazily loaded and initialized,
             // an environment variable must be set so BoringSSL is configured to use ECDSA TLS
-            // certificates (required by btcwallet).
+            // certificates (required by cashwallet).
             Environment.SetEnvironmentVariable("GRPC_SSL_CIPHER_SUITES", "HIGH+ECDSA");
 
             var walletAppData = Portability.LocalAppData(Environment.OSVersion.Platform, "Btcwallet");
@@ -342,12 +342,12 @@ the wallet's API from the `.proto`.  Instead, a call to `grpc.load`
 with the `.proto` file path dynamically loads the Protobuf descriptor
 and generates bindings for each service.  Either copy the `.proto` to
 the client project directory, or reference the file from the
-`btcwallet` project directory.
+`cashwallet` project directory.
 
 ```JavaScript
 // Before the gRPC native library (gRPC Core) is lazily loaded and
 // initialized, an environment variable must be set so BoringSSL is
-// configured to use ECDSA TLS certificates (required by btcwallet).
+// configured to use ECDSA TLS certificates (required by cashwallet).
 process.env['GRPC_SSL_CIPHER_SUITES'] = 'HIGH+ECDSA';
 
 var fs = require('fs');
@@ -357,7 +357,7 @@ var grpc = require('grpc');
 var protoDescriptor = grpc.load('./api.proto');
 var walletrpc = protoDescriptor.walletrpc;
 
-var certPath = path.join(process.env.HOME, '.btcwallet', 'rpc.cert');
+var certPath = path.join(process.env.HOME, '.cashwallet', 'rpc.cert');
 if (os.platform == 'win32') {
     certPath = path.join(process.env.LOCALAPPDATA, 'Btcwallet', 'rpc.cert');
 } else if (os.platform == 'darwin') {
@@ -394,9 +394,9 @@ Full instructions for this procedure can be found
 Generate Python stubs from the `.proto`:
 
 ```bash
-$ protoc -I /path/to/btcsuite/btcwallet/rpc --python_out=. --grpc_out=. \
+$ protoc -I /path/to/btcsuite/cashwallet/rpc --python_out=. --grpc_out=. \
   --plugin=protoc-gen-grpc=$(which grpc_python_plugin) \
-  /path/to/btcwallet/rpc/api.proto
+  /path/to/cashwallet/rpc/api.proto
 ```
 
 Implement the client:
@@ -413,10 +413,10 @@ timeout = 1 # seconds
 def main():
     # Before the gRPC native library (gRPC Core) is lazily loaded and
     # initialized, an environment variable must be set so BoringSSL is
-    # configured to use ECDSA TLS certificates (required by btcwallet).
+    # configured to use ECDSA TLS certificates (required by cashwallet).
     os.environ['GRPC_SSL_CIPHER_SUITES'] = 'HIGH+ECDSA'
 
-    cert_file_path = os.path.join(os.environ['HOME'], '.btcwallet', 'rpc.cert')
+    cert_file_path = os.path.join(os.environ['HOME'], '.cashwallet', 'rpc.cert')
     if platform.system() == 'Windows':
         cert_file_path = os.path.join(os.environ['LOCALAPPDATA'], "Btcwallet", "rpc.cert")
     elif platform.system() == 'Darwin':

@@ -10,11 +10,11 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/btcsuite/btcd/btcec"
-	"github.com/btcsuite/btcutil"
-	"github.com/btcsuite/btcutil/hdkeychain"
-	"github.com/btcsuite/btcwallet/internal/zero"
-	"github.com/btcsuite/btcwallet/walletdb"
+	"github.com/bcext/gcash/btcec"
+	"github.com/bcext/cashutil"
+	"github.com/bcext/cashutil/hdkeychain"
+	"github.com/bcext/cashwallet/internal/zero"
+	"github.com/bcext/cashwallet/walletdb"
 )
 
 // AddressType represents the various address types waddrmgr is currently able
@@ -45,8 +45,8 @@ type ManagedAddress interface {
 	// Account returns the account the address is associated with.
 	Account() uint32
 
-	// Address returns a btcutil.Address for the backing address.
-	Address() btcutil.Address
+	// Address returns a cashutil.Address for the backing address.
+	Address() cashutil.Address
 
 	// AddrHash returns the key or script hash related to the address
 	AddrHash() []byte
@@ -90,7 +90,7 @@ type ManagedPubKeyAddress interface {
 
 	// ExportPrivKey returns the private key associated with the address
 	// serialized as Wallet Import Format (WIF).
-	ExportPrivKey() (*btcutil.WIF, error)
+	ExportPrivKey() (*cashutil.WIF, error)
 }
 
 // ManagedScriptAddress extends ManagedAddress and represents a pay-to-script-hash
@@ -108,7 +108,7 @@ type ManagedScriptAddress interface {
 type managedAddress struct {
 	manager          *ScopedKeyManager
 	account          uint32
-	address          btcutil.Address
+	address          cashutil.Address
 	imported         bool
 	internal         bool
 	compressed       bool
@@ -174,11 +174,11 @@ func (a *managedAddress) AddrType() AddressType {
 	return a.addrType
 }
 
-// Address returns the btcutil.Address which represents the managed address.
+// Address returns the cashutil.Address which represents the managed address.
 // This will be a pay-to-pubkey-hash address.
 //
 // This is part of the ManagedAddress interface implementation.
-func (a *managedAddress) Address() btcutil.Address {
+func (a *managedAddress) Address() cashutil.Address {
 	return a.address
 }
 
@@ -189,9 +189,9 @@ func (a *managedAddress) AddrHash() []byte {
 	var hash []byte
 
 	switch n := a.address.(type) {
-	case *btcutil.AddressPubKeyHash:
+	case *cashutil.AddressPubKeyHash:
 		hash = n.Hash160()[:]
-	case *btcutil.AddressScriptHash:
+	case *cashutil.AddressScriptHash:
 		hash = n.Hash160()[:]
 	}
 
@@ -287,13 +287,13 @@ func (a *managedAddress) PrivKey() (*btcec.PrivateKey, error) {
 // Import Format (WIF).
 //
 // This is part of the ManagedPubKeyAddress interface implementation.
-func (a *managedAddress) ExportPrivKey() (*btcutil.WIF, error) {
+func (a *managedAddress) ExportPrivKey() (*cashutil.WIF, error) {
 	pk, err := a.PrivKey()
 	if err != nil {
 		return nil, err
 	}
 
-	return btcutil.NewWIF(pk, a.manager.rootManager.chainParams, a.compressed)
+	return cashutil.NewWIF(pk, a.manager.rootManager.chainParams, a.compressed)
 }
 
 // newManagedAddressWithoutPrivKey returns a new managed address based on the
@@ -305,16 +305,16 @@ func newManagedAddressWithoutPrivKey(m *ScopedKeyManager, account uint32, pubKey
 	// Create a pay-to-pubkey-hash address from the public key.
 	var pubKeyHash []byte
 	if compressed {
-		pubKeyHash = btcutil.Hash160(pubKey.SerializeCompressed())
+		pubKeyHash = cashutil.Hash160(pubKey.SerializeCompressed())
 	} else {
-		pubKeyHash = btcutil.Hash160(pubKey.SerializeUncompressed())
+		pubKeyHash = cashutil.Hash160(pubKey.SerializeUncompressed())
 	}
 
-	var address btcutil.Address
+	var address cashutil.Address
 	var err error
 
 	if addrType == PubKeyHash {
-		address, err = btcutil.NewAddressPubKeyHash(
+		address, err = cashutil.NewAddressPubKeyHash(
 			pubKeyHash, m.rootManager.chainParams,
 		)
 		if err != nil {
@@ -412,7 +412,7 @@ func newManagedAddressFromExtKey(s *ScopedKeyManager, account uint32,
 type scriptAddress struct {
 	manager         *ScopedKeyManager
 	account         uint32
-	address         *btcutil.AddressScriptHash
+	address         *cashutil.AddressScriptHash
 	scriptEncrypted []byte
 	scriptCT        []byte
 	scriptMutex     sync.Mutex
@@ -472,11 +472,11 @@ func (a *scriptAddress) AddrType() AddressType {
 	return Script
 }
 
-// Address returns the btcutil.Address which represents the managed address.
+// Address returns the cashutil.Address which represents the managed address.
 // This will be a pay-to-script-hash address.
 //
 // This is part of the ManagedAddress interface implementation.
-func (a *scriptAddress) Address() btcutil.Address {
+func (a *scriptAddress) Address() cashutil.Address {
 	return a.address
 }
 
@@ -544,7 +544,7 @@ func (a *scriptAddress) Script() ([]byte, error) {
 func newScriptAddress(m *ScopedKeyManager, account uint32, scriptHash,
 	scriptEncrypted []byte) (*scriptAddress, error) {
 
-	address, err := btcutil.NewAddressScriptHashFromHash(
+	address, err := cashutil.NewAddressScriptHashFromHash(
 		scriptHash, m.rootManager.chainParams,
 	)
 	if err != nil {

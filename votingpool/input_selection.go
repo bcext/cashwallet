@@ -21,11 +21,11 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/btcsuite/btcd/chaincfg"
-	"github.com/btcsuite/btcd/txscript"
-	"github.com/btcsuite/btcutil"
-	"github.com/btcsuite/btcwallet/walletdb"
-	"github.com/btcsuite/btcwallet/wtxmgr"
+	"github.com/bcext/gcash/chaincfg"
+	"github.com/bcext/gcash/txscript"
+	"github.com/bcext/cashutil"
+	"github.com/bcext/cashwallet/walletdb"
+	"github.com/bcext/cashwallet/wtxmgr"
 )
 
 const eligibleInputMinConfirmations = 100
@@ -100,7 +100,7 @@ func (c byAddress) Less(i, j int) bool {
 // and the last used address of lastSeriesID. They're reverse ordered based on
 // their address.
 func (p *Pool) getEligibleInputs(ns, addrmgrNs walletdb.ReadBucket, store *wtxmgr.Store, txmgrNs walletdb.ReadBucket, startAddress WithdrawalAddress,
-	lastSeriesID uint32, dustThreshold btcutil.Amount, chainHeight int32,
+	lastSeriesID uint32, dustThreshold cashutil.Amount, chainHeight int32,
 	minConf int) ([]credit, error) {
 
 	if p.Series(lastSeriesID) == nil {
@@ -238,7 +238,7 @@ func groupCreditsByAddr(credits []wtxmgr.Credit, chainParams *chaincfg.Params) (
 // to number of confirmations, the dust threshold and that it is not
 // the charter output.
 func (p *Pool) isCreditEligible(c credit, minConf int, chainHeight int32,
-	dustThreshold btcutil.Amount) bool {
+	dustThreshold cashutil.Amount) bool {
 	if c.Amount < dustThreshold {
 		return false
 	}

@@ -8,17 +8,17 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/btcsuite/btcutil"
+	"github.com/bcext/cashutil"
 )
 
-// AmountFlag embeds a btcutil.Amount and implements the flags.Marshaler and
+// AmountFlag embeds a cashutil.Amount and implements the flags.Marshaler and
 // Unmarshaler interfaces so it can be used as a config struct field.
 type AmountFlag struct {
-	btcutil.Amount
+	cashutil.Amount
 }
 
-// NewAmountFlag creates an AmountFlag with a default btcutil.Amount.
-func NewAmountFlag(defaultValue btcutil.Amount) *AmountFlag {
+// NewAmountFlag creates an AmountFlag with a default cashutil.Amount.
+func NewAmountFlag(defaultValue cashutil.Amount) *AmountFlag {
 	return &AmountFlag{defaultValue}
 }
 
@@ -34,7 +34,7 @@ func (a *AmountFlag) UnmarshalFlag(value string) error {
 	if err != nil {
 		return err
 	}
-	amount, err := btcutil.NewAmount(valueF64)
+	amount, err := cashutil.NewAmount(valueF64)
 	if err != nil {
 		return err
 	}

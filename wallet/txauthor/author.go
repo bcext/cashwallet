@@ -9,14 +9,14 @@ package txauthor
 import (
 	"errors"
 
-	"github.com/btcsuite/btcd/chaincfg"
-	"github.com/btcsuite/btcd/txscript"
-	"github.com/btcsuite/btcd/wire"
-	"github.com/btcsuite/btcutil"
-	"github.com/btcsuite/btcwallet/wallet/txrules"
+	"github.com/bcext/cashutil"
+	"github.com/bcext/cashwallet/wallet/txrules"
+	"github.com/bcext/gcash/chaincfg"
+	"github.com/bcext/gcash/txscript"
+	"github.com/bcext/gcash/wire"
 
-	h "github.com/btcsuite/btcwallet/internal/helpers"
-	"github.com/btcsuite/btcwallet/wallet/internal/txsizes"
+	h "github.com/bcext/cashwallet/internal/helpers"
+	"github.com/bcext/cashwallet/wallet/internal/txsizes"
 )
 
 // InputSource provides transaction inputs referencing spendable outputs to
@@ -24,8 +24,8 @@ import (
 // can not be satisified, this can be signaled by returning a total amount less
 // than the target or by returning a more detailed error implementing
 // InputSourceError.
-type InputSource func(target btcutil.Amount) (total btcutil.Amount, inputs []*wire.TxIn,
-	inputValues []btcutil.Amount, scripts [][]byte, err error)
+type InputSource func(target cashutil.Amount) (total cashutil.Amount, inputs []*wire.TxIn,
+	inputValues []cashutil.Amount, scripts [][]byte, err error)
 
 // InputSourceError describes the failure to provide enough input value from
 // unspent transaction outputs to meet a target amount.  A typed error is used
@@ -50,8 +50,8 @@ func (insufficientFundsError) Error() string {
 type AuthoredTx struct {
 	Tx              *wire.MsgTx
 	PrevScripts     [][]byte
-	PrevInputValues []btcutil.Amount
-	TotalInput      btcutil.Amount
+	PrevInputValues []cashutil.Amount
+	TotalInput      cashutil.Amount
 	ChangeIndex     int // negative if no change
 }
 
@@ -78,7 +78,7 @@ type ChangeSource func() ([]byte, error)
 // InputSourceError is returned.
 //
 // BUGS: Fee estimation may be off when redeeming non-compressed P2PKH outputs.
-func NewUnsignedTransaction(outputs []*wire.TxOut, relayFeePerKb btcutil.Amount,
+func NewUnsignedTransaction(outputs []*wire.TxOut, relayFeePerKb cashutil.Amount,
 	fetchInputs InputSource, fetchChange ChangeSource) (*AuthoredTx, error) {
 
 	targetAmount := h.SumOutputValues(outputs)
@@ -185,7 +185,7 @@ type SecretsSource interface {
 // are passed in prevPkScripts and the slice length must match the number of
 // inputs.  Private keys and redeem scripts are looked up using a SecretsSource
 // based on the previous output script.
-func AddAllInputScripts(tx *wire.MsgTx, prevPkScripts [][]byte, inputValues []btcutil.Amount,
+func AddAllInputScripts(tx *wire.MsgTx, prevPkScripts [][]byte, inputValues []cashutil.Amount,
 	secrets SecretsSource) error {
 
 	inputs := tx.TxIn

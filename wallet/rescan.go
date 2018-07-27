@@ -5,25 +5,25 @@
 package wallet
 
 import (
-	"github.com/btcsuite/btcd/txscript"
-	"github.com/btcsuite/btcd/wire"
-	"github.com/btcsuite/btcutil"
-	"github.com/btcsuite/btcwallet/chain"
-	"github.com/btcsuite/btcwallet/waddrmgr"
-	"github.com/btcsuite/btcwallet/wtxmgr"
+	"github.com/bcext/gcash/txscript"
+	"github.com/bcext/gcash/wire"
+	"github.com/bcext/cashutil"
+	"github.com/bcext/cashwallet/chain"
+	"github.com/bcext/cashwallet/waddrmgr"
+	"github.com/bcext/cashwallet/wtxmgr"
 )
 
 // RescanProgressMsg reports the current progress made by a rescan for a
 // set of wallet addresses.
 type RescanProgressMsg struct {
-	Addresses    []btcutil.Address
+	Addresses    []cashutil.Address
 	Notification *chain.RescanProgress
 }
 
 // RescanFinishedMsg reports the addresses that were rescanned when a
 // rescanfinished message was received rescanning a batch of addresses.
 type RescanFinishedMsg struct {
-	Addresses    []btcutil.Address
+	Addresses    []cashutil.Address
 	Notification *chain.RescanFinished
 }
 
@@ -34,8 +34,8 @@ type RescanFinishedMsg struct {
 // channel.
 type RescanJob struct {
 	InitialSync bool
-	Addrs       []btcutil.Address
-	OutPoints   map[wire.OutPoint]btcutil.Address
+	Addrs       []cashutil.Address
+	OutPoints   map[wire.OutPoint]cashutil.Address
 	BlockStamp  waddrmgr.BlockStamp
 	err         chan error
 }
@@ -44,8 +44,8 @@ type RescanJob struct {
 // together before a rescan is performed.
 type rescanBatch struct {
 	initialSync bool
-	addrs       []btcutil.Address
-	outpoints   map[wire.OutPoint]btcutil.Address
+	addrs       []cashutil.Address
+	outpoints   map[wire.OutPoint]cashutil.Address
 	bs          waddrmgr.BlockStamp
 	errChans    []chan error
 }
@@ -244,8 +244,8 @@ out:
 // a wallet.  This is intended to be used to sync a wallet back up to the
 // current best block in the main chain, and is considered an initial sync
 // rescan.
-func (w *Wallet) Rescan(addrs []btcutil.Address, unspent []wtxmgr.Credit) error {
-	outpoints := make(map[wire.OutPoint]btcutil.Address, len(unspent))
+func (w *Wallet) Rescan(addrs []cashutil.Address, unspent []wtxmgr.Credit) error {
+	outpoints := make(map[wire.OutPoint]cashutil.Address, len(unspent))
 	for _, output := range unspent {
 		_, outputAddrs, _, err := txscript.ExtractPkScriptAddrs(
 			output.PkScript, w.chainParams,

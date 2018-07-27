@@ -3,15 +3,15 @@ package wallet
 import (
 	"time"
 
-	"github.com/btcsuite/btcd/chaincfg"
-	"github.com/btcsuite/btcd/chaincfg/chainhash"
-	"github.com/btcsuite/btcd/txscript"
-	"github.com/btcsuite/btcd/wire"
-	"github.com/btcsuite/btcutil"
-	"github.com/btcsuite/btcutil/hdkeychain"
-	"github.com/btcsuite/btcwallet/waddrmgr"
-	"github.com/btcsuite/btcwallet/walletdb"
-	"github.com/btcsuite/btcwallet/wtxmgr"
+	"github.com/bcext/gcash/chaincfg"
+	"github.com/bcext/gcash/chaincfg/chainhash"
+	"github.com/bcext/gcash/txscript"
+	"github.com/bcext/gcash/wire"
+	"github.com/bcext/cashutil"
+	"github.com/bcext/cashutil/hdkeychain"
+	"github.com/bcext/cashwallet/waddrmgr"
+	"github.com/bcext/cashwallet/walletdb"
+	"github.com/bcext/cashwallet/wtxmgr"
 )
 
 // RecoveryManager maintains the state required to recover previously used
@@ -207,7 +207,7 @@ type RecoveryState struct {
 	// watchedOutPoints contains the set of all outpoints known to the
 	// wallet. This is updated iteratively as new outpoints are found during
 	// a rescan.
-	watchedOutPoints map[wire.OutPoint]btcutil.Address
+	watchedOutPoints map[wire.OutPoint]cashutil.Address
 }
 
 // NewRecoveryState creates a new RecoveryState using the provided
@@ -219,7 +219,7 @@ func NewRecoveryState(recoveryWindow uint32) *RecoveryState {
 	return &RecoveryState{
 		recoveryWindow:   recoveryWindow,
 		scopes:           scopes,
-		watchedOutPoints: make(map[wire.OutPoint]btcutil.Address),
+		watchedOutPoints: make(map[wire.OutPoint]cashutil.Address),
 	}
 }
 
@@ -243,14 +243,14 @@ func (rs *RecoveryState) StateForScope(
 
 // WatchedOutPoints returns the global set of outpoints that are known to belong
 // to the wallet during recovery.
-func (rs *RecoveryState) WatchedOutPoints() map[wire.OutPoint]btcutil.Address {
+func (rs *RecoveryState) WatchedOutPoints() map[wire.OutPoint]cashutil.Address {
 	return rs.watchedOutPoints
 }
 
 // AddWatchedOutPoint updates the recovery state's set of known outpoints that
 // we will monitor for spends during recovery.
 func (rs *RecoveryState) AddWatchedOutPoint(outPoint *wire.OutPoint,
-	addr btcutil.Address) {
+	addr cashutil.Address) {
 
 	rs.watchedOutPoints[*outPoint] = addr
 }
@@ -302,7 +302,7 @@ type BranchRecoveryState struct {
 
 	// addresses is a map of child index to address for all actively watched
 	// addresses belonging to this branch.
-	addresses map[uint32]btcutil.Address
+	addresses map[uint32]cashutil.Address
 
 	// invalidChildren records the set of child indexes that derive to
 	// invalid keys.
@@ -314,7 +314,7 @@ type BranchRecoveryState struct {
 func NewBranchRecoveryState(recoveryWindow uint32) *BranchRecoveryState {
 	return &BranchRecoveryState{
 		recoveryWindow:  recoveryWindow,
-		addresses:       make(map[uint32]btcutil.Address),
+		addresses:       make(map[uint32]cashutil.Address),
 		invalidChildren: make(map[uint32]struct{}),
 	}
 }
@@ -346,12 +346,12 @@ func (brs *BranchRecoveryState) ExtendHorizon() (uint32, uint32) {
 
 // AddAddr adds a freshly derived address from our lookahead into the map of
 // known addresses for this branch.
-func (brs *BranchRecoveryState) AddAddr(index uint32, addr btcutil.Address) {
+func (brs *BranchRecoveryState) AddAddr(index uint32, addr cashutil.Address) {
 	brs.addresses[index] = addr
 }
 
 // GetAddr returns the address derived from a given child index.
-func (brs *BranchRecoveryState) GetAddr(index uint32) btcutil.Address {
+func (brs *BranchRecoveryState) GetAddr(index uint32) cashutil.Address {
 	return brs.addresses[index]
 }
 
@@ -390,7 +390,7 @@ func (brs *BranchRecoveryState) NextUnfound() uint32 {
 
 // Addrs returns a map of all currently derived child indexes to the their
 // corresponding addresses.
-func (brs *BranchRecoveryState) Addrs() map[uint32]btcutil.Address {
+func (brs *BranchRecoveryState) Addrs() map[uint32]cashutil.Address {
 	return brs.addresses
 }
 
