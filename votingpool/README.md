@@ -1,8 +1,8 @@
 votingpool
 ========
 
-[![Build Status](https://travis-ci.org/btcsuite/cashwallet.png?branch=master)]
-(https://travis-ci.org/btcsuite/cashwallet)
+[![Build Status](https://travis-ci.org/bcext/cashwallet.png?branch=master)]
+(https://travis-ci.org/bcext/cashwallet)
 
 Package votingpool provides voting pool functionality for cashwallet as
 described here:

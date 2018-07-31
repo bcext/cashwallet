@@ -1,7 +1,7 @@
 wallet
 ======
 
-[![Build Status](https://travis-ci.org/btcsuite/cashwallet.png?branch=master)]
+[![Build Status](https://travis-ci.org/bcext/cashwallet.png?branch=master)]
 (https://travis-ci.org/bcext/cashwallet)
 
 ## Feature Overview

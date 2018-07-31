@@ -1,8 +1,8 @@
 wtxmgr
 ======
 
-[![Build Status](https://travis-ci.org/btcsuite/cashwallet.png?branch=master)]
-(https://travis-ci.org/btcsuite/cashwallet)
+[![Build Status](https://travis-ci.org/bcext/cashwallet.png?branch=master)]
+(https://travis-ci.org/bcext/cashwallet)
 
 Package wtxmgr provides storage and spend tracking of wallet transactions and
 their relevant input and outputs.

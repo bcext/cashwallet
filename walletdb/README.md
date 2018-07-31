@@ -1,8 +1,8 @@
 walletdb
 ========
 
-[![Build Status](https://travis-ci.org/btcsuite/cashwallet.png?branch=master)]
-(https://travis-ci.org/btcsuite/cashwallet)
+[![Build Status](https://travis-ci.org/bcext/cashwallet.png?branch=master)]
+(https://travis-ci.org/bcext/cashwallet)
 
 Package walletdb provides a namespaced database interface for cashwallet.
 

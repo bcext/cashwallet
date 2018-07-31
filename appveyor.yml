@@ -1,6 +1,6 @@
 version: "{build}"
 
-clone_folder: c:\projects\src\github.com\btcsuite\cashwallet
+clone_folder: c:\projects\src\github.com\bcext\cashwallet
 
 environment:
  PATH: c:\projects\bin;%PATH%

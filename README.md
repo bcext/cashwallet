@@ -1,10 +1,10 @@
 cashwallet
 =========
 
-[![Build Status](https://travis-ci.org/btcsuite/cashwallet.png?branch=master)](https://travis-ci.org/btcsuite/cashwallet)
+[![Build Status](https://travis-ci.org/bcext/cashwallet.png?branch=master)](https://travis-ci.org/bcext/cashwallet)
 [![Build status](https://ci.appveyor.com/api/projects/status/88nxvckdj8upqr36/branch/master?svg=true)](https://ci.appveyor.com/project/jrick/cashwallet/branch/master)
 
-cashwallet is a daemon handling bitcoin wallet functionality for a
+cashwallet is a daemon handling bitcoin cash wallet functionality for a
 single user.  It acts as both an RPC client to gcash and an RPC server
 for wallet clients and legacy RPC applications.
 
@@ -31,15 +31,15 @@ cashwallet is not an SPV client and requires connecting to a local or
 remote gcash instance for asynchronous blockchain queries and
 notifications over websockets.  Full gcash installation instructions
 can be found [here](https://github.com/bcext/gcash).  An alternative
-SPV mode that is compatible with gcash and Bitcoin Core is planned for
+SPV mode that is compatible with gcash and Bitcoin-ABC is planned for
 a future release.
 
 Wallet clients can use one of two RPC servers:
 
-  1. A legacy JSON-RPC server mostly compatible with Bitcoin Core
+  1. A legacy JSON-RPC server mostly compatible with Bitcoin-ABC
 
      The JSON-RPC server exists to ease the migration of wallet applications
-     from Core, but complete compatibility is not guaranteed.  Some portions of
+     from Bitcoin-ABC, but complete compatibility is not guaranteed.  Some portions of
      the API (and especially accounts) have to work differently due to other
      design decisions (mostly due to BIP0044).  However, if you find a
      compatibility issue and feel that it could be reasonably supported, please
@@ -166,18 +166,18 @@ RPC username and password.
 
 PowerShell (Installed from MSI):
 ```
-PS> cp "$env:ProgramFiles\Btcd Suite\Btcd\sample-gcash.conf" $env:LOCALAPPDATA\Btcd\gcash.conf
-PS> cp "$env:ProgramFiles\Btcd Suite\Btcwallet\sample-cashwallet.conf" $env:LOCALAPPDATA\Btcwallet\cashwallet.conf
-PS> $editor $env:LOCALAPPDATA\Btcd\gcash.conf
-PS> $editor $env:LOCALAPPDATA\Btcwallet\cashwallet.conf
+PS> cp "$env:ProgramFiles\Bcext\Gcash\sample-gcash.conf" $env:LOCALAPPDATA\Gcash\gcash.conf
+PS> cp "$env:ProgramFiles\Bcext\Cashwallet\sample-cashwallet.conf" $env:LOCALAPPDATA\Cashwallet\cashwallet.conf
+PS> $editor $env:LOCALAPPDATA\Gcash\gcash.conf
+PS> $editor $env:LOCALAPPDATA\Cashwallet\cashwallet.conf
 ```
 
 PowerShell (Installed from source):
 ```
-PS> cp $env:GOPATH\src\github.com\btcsuite\gcash\sample-gcash.conf $env:LOCALAPPDATA\Btcd\gcash.conf
-PS> cp $env:GOPATH\src\github.com\btcsuite\cashwallet\sample-cashwallet.conf $env:LOCALAPPDATA\Btcwallet\cashwallet.conf
-PS> $editor $env:LOCALAPPDATA\Btcd\gcash.conf
-PS> $editor $env:LOCALAPPDATA\Btcwallet\cashwallet.conf
+PS> cp $env:GOPATH\src\github.com\bcext\gcash\sample-gcash.conf $env:LOCALAPPDATA\Gcash\gcash.conf
+PS> cp $env:GOPATH\src\github.com\bcext\cashwallet\sample-cashwallet.conf $env:LOCALAPPDATA\Cashwallet\cashwallet.conf
+PS> $editor $env:LOCALAPPDATA\Gcash\gcash.conf
+PS> $editor $env:LOCALAPPDATA\Cashwallet\cashwallet.conf
 ```
 
 Linux/BSD/POSIX (Installed from source):

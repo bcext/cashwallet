@@ -394,7 +394,7 @@ Full instructions for this procedure can be found
 Generate Python stubs from the `.proto`:
 
 ```bash
-$ protoc -I /path/to/btcsuite/cashwallet/rpc --python_out=. --grpc_out=. \
+$ protoc -I /path/to/bcext/cashwallet/rpc --python_out=. --grpc_out=. \
   --plugin=protoc-gen-grpc=$(which grpc_python_plugin) \
   /path/to/cashwallet/rpc/api.proto
 ```

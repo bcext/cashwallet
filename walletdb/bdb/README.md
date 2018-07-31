@@ -1,8 +1,8 @@
 bdb
 ===
 
-[![Build Status](https://travis-ci.org/btcsuite/cashwallet.png?branch=master)]
-(https://travis-ci.org/btcsuite/cashwallet)
+[![Build Status](https://travis-ci.org/bcext/cashwallet.png?branch=master)]
+(https://travis-ci.org/bcext/cashwallet)
 
 Package bdb implements an driver for walletdb that uses boltdb for the backing
 datastore.  Package bdb is licensed under the copyfree ISC license.
