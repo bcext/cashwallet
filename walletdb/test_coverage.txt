@@ -1,39 +1,51 @@
 PASS
-coverage: 100.0% of statements
-ok  	github.com/conformal/cashwallet/walletdb	0.130s
-github.com\conformal\cashwallet\walletdb\interface.go:190:	RegisterDriver		100.0%
-github.com\conformal\cashwallet\walletdb\interface.go:201:	SupportedDrivers	100.0%
-github.com\conformal\cashwallet\walletdb\interface.go:214:	Create			100.0%
-github.com\conformal\cashwallet\walletdb\interface.go:228:	Open			100.0%
-total:								(statements)		100.0%
+coverage: 58.3% of statements
+ok  	github.com/bcext/cashwallet/walletdb	0.012s
+github.com/bcext/cashwallet/walletdb/interface.go:165:	BucketIsEmpty		0.0%
+github.com/bcext/cashwallet/walletdb/interface.go:191:	View			0.0%
+github.com/bcext/cashwallet/walletdb/interface.go:213:	Update			62.5%
+github.com/bcext/cashwallet/walletdb/interface.go:252:	RegisterDriver		100.0%
+github.com/bcext/cashwallet/walletdb/interface.go:263:	SupportedDrivers	100.0%
+github.com/bcext/cashwallet/walletdb/interface.go:276:	Create			100.0%
+github.com/bcext/cashwallet/walletdb/interface.go:290:	Open			100.0%
+total:							(statements)		58.3%
 ============================================================
 PASS
-coverage: 91.7% of statements
-ok  	github.com/conformal/cashwallet/walletdb/bdb	0.149s
-github.com\conformal\cashwallet\walletdb\bdb\db.go:28:		convertErr		76.9%
-github.com\conformal\cashwallet\walletdb\bdb\db.go:74:		Bucket			100.0%
-github.com\conformal\cashwallet\walletdb\bdb\db.go:90:		CreateBucket		100.0%
-github.com\conformal\cashwallet\walletdb\bdb\db.go:103:		CreateBucketIfNotExists	100.0%
-github.com\conformal\cashwallet\walletdb\bdb\db.go:116:		DeleteBucket		100.0%
-github.com\conformal\cashwallet\walletdb\bdb\db.go:129:		ForEach			100.0%
-github.com\conformal\cashwallet\walletdb\bdb\db.go:136:		Writable		100.0%
-github.com\conformal\cashwallet\walletdb\bdb\db.go:145:		Put			100.0%
-github.com\conformal\cashwallet\walletdb\bdb\db.go:157:		Get			100.0%
-github.com\conformal\cashwallet\walletdb\bdb\db.go:166:		Delete			100.0%
-github.com\conformal\cashwallet\walletdb\bdb\db.go:185:		RootBucket		100.0%
-github.com\conformal\cashwallet\walletdb\bdb\db.go:193:		Commit			100.0%
-github.com\conformal\cashwallet\walletdb\bdb\db.go:201:		Rollback		100.0%
-github.com\conformal\cashwallet\walletdb\bdb\db.go:227:		Begin			85.7%
-github.com\conformal\cashwallet\walletdb\bdb\db.go:249:		View			100.0%
-github.com\conformal\cashwallet\walletdb\bdb\db.go:270:		Update			100.0%
-github.com\conformal\cashwallet\walletdb\bdb\db.go:294:		Namespace		93.3%
-github.com\conformal\cashwallet\walletdb\bdb\db.go:329:		DeleteNamespace		100.0%
-github.com\conformal\cashwallet\walletdb\bdb\db.go:339:		WriteTo			0.0%
-github.com\conformal\cashwallet\walletdb\bdb\db.go:348:		Close			100.0%
-github.com\conformal\cashwallet\walletdb\bdb\db.go:353:		fileExists		100.0%
-github.com\conformal\cashwallet\walletdb\bdb\db.go:364:		openDB			100.0%
-github.com\conformal\cashwallet\walletdb\bdb\driver.go:34:	parseArgs		100.0%
-github.com\conformal\cashwallet\walletdb\bdb\driver.go:50:	openDBDriver		100.0%
-github.com\conformal\cashwallet\walletdb\bdb\driver.go:60:	createDBDriver		100.0%
-github.com\conformal\cashwallet\walletdb\bdb\driver.go:69:	init			66.7%
-total:								(statements)		91.7%
+coverage: 77.3% of statements
+ok  	github.com/bcext/cashwallet/walletdb/bdb	0.013s
+github.com/bcext/cashwallet/walletdb/bdb/db.go:16:	convertErr		69.2%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:58:	ReadBucket		100.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:62:	ReadWriteBucket		75.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:70:	CreateTopLevelBucket	75.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:78:	DeleteTopLevelBucket	75.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:90:	Commit			100.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:98:	Rollback		100.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:113:	NestedReadWriteBucket	100.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:122:	NestedReadBucket	0.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:132:	CreateBucket		100.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:145:	CreateBucketIfNotExists	75.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:158:	DeleteNestedBucket	100.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:171:	ForEach			100.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:180:	Put			100.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:192:	Get			100.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:201:	Delete			100.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:205:	ReadCursor		0.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:213:	ReadWriteCursor		0.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:232:	Delete			0.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:239:	First			0.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:246:	Last			0.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:253:	Next			0.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:260:	Prev			0.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:268:	Seek			0.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:280:	beginTx			100.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:288:	BeginReadTx		100.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:292:	BeginReadWriteTx	100.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:300:	Copy			0.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:309:	Close			100.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:314:	fileExists		100.0%
+github.com/bcext/cashwallet/walletdb/bdb/db.go:325:	openDB			100.0%
+github.com/bcext/cashwallet/walletdb/bdb/driver.go:18:	parseArgs		100.0%
+github.com/bcext/cashwallet/walletdb/bdb/driver.go:35:	openDBDriver		100.0%
+github.com/bcext/cashwallet/walletdb/bdb/driver.go:46:	createDBDriver		100.0%
+github.com/bcext/cashwallet/walletdb/bdb/driver.go:55:	init			66.7%
+total:							(statements)		77.3%
