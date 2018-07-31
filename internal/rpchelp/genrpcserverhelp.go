@@ -12,8 +12,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/bcext/gcash/btcjson"
 	"github.com/bcext/cashwallet/internal/rpchelp"
+	"github.com/bcext/gcash/btcjson"
 )
 
 var outputFile = func() *os.File {

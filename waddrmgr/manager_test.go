@@ -14,11 +14,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/bcext/gcash/chaincfg"
-	"github.com/bcext/gcash/chaincfg/chainhash"
 	"github.com/bcext/cashutil"
 	"github.com/bcext/cashwallet/waddrmgr"
 	"github.com/bcext/cashwallet/walletdb"
+	"github.com/bcext/gcash/chaincfg"
+	"github.com/bcext/gcash/chaincfg/chainhash"
 )
 
 // newHash converts the passed big-endian hex string into a chainhash.Hash.

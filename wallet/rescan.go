@@ -5,12 +5,12 @@
 package wallet
 
 import (
-	"github.com/bcext/gcash/txscript"
-	"github.com/bcext/gcash/wire"
 	"github.com/bcext/cashutil"
 	"github.com/bcext/cashwallet/chain"
 	"github.com/bcext/cashwallet/waddrmgr"
 	"github.com/bcext/cashwallet/wtxmgr"
+	"github.com/bcext/gcash/txscript"
+	"github.com/bcext/gcash/wire"
 )
 
 // RescanProgressMsg reports the current progress made by a rescan for a

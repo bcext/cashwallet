@@ -21,11 +21,11 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/bcext/gcash/chaincfg"
-	"github.com/bcext/gcash/txscript"
 	"github.com/bcext/cashutil"
 	"github.com/bcext/cashwallet/walletdb"
 	"github.com/bcext/cashwallet/wtxmgr"
+	"github.com/bcext/gcash/chaincfg"
+	"github.com/bcext/gcash/txscript"
 )
 
 const eligibleInputMinConfirmations = 100

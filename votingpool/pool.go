@@ -8,12 +8,12 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/bcext/gcash/txscript"
 	"github.com/bcext/cashutil"
 	"github.com/bcext/cashutil/hdkeychain"
 	"github.com/bcext/cashwallet/internal/zero"
 	"github.com/bcext/cashwallet/waddrmgr"
 	"github.com/bcext/cashwallet/walletdb"
+	"github.com/bcext/gcash/txscript"
 )
 
 const (

@@ -5,10 +5,10 @@
 package votingpool
 
 import (
-	"github.com/bcext/gcash/wire"
 	"github.com/bcext/cashutil/hdkeychain"
 	"github.com/bcext/cashwallet/waddrmgr"
 	"github.com/bcext/cashwallet/walletdb"
+	"github.com/bcext/gcash/wire"
 )
 
 var TstLastErr = lastErr

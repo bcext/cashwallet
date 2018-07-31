@@ -8,11 +8,11 @@ package txauthor_test
 import (
 	"testing"
 
-	"github.com/bcext/gcash/wire"
 	"github.com/bcext/cashutil"
 	"github.com/bcext/cashwallet/wallet/internal/txsizes"
 	. "github.com/bcext/cashwallet/wallet/txauthor"
 	"github.com/bcext/cashwallet/wallet/txrules"
+	"github.com/bcext/gcash/wire"
 )
 
 func p2pkhOutputs(amounts ...cashutil.Amount) []*wire.TxOut {

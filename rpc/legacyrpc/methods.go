@@ -16,6 +16,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/bcext/cashutil"
+	"github.com/bcext/cashwallet/chain"
+	"github.com/bcext/cashwallet/waddrmgr"
+	"github.com/bcext/cashwallet/wallet"
+	"github.com/bcext/cashwallet/wallet/txrules"
+	"github.com/bcext/cashwallet/wtxmgr"
 	"github.com/bcext/gcash/btcec"
 	"github.com/bcext/gcash/btcjson"
 	"github.com/bcext/gcash/chaincfg"
@@ -23,12 +29,6 @@ import (
 	"github.com/bcext/gcash/rpcclient"
 	"github.com/bcext/gcash/txscript"
 	"github.com/bcext/gcash/wire"
-	"github.com/bcext/cashutil"
-	"github.com/bcext/cashwallet/chain"
-	"github.com/bcext/cashwallet/waddrmgr"
-	"github.com/bcext/cashwallet/wallet"
-	"github.com/bcext/cashwallet/wallet/txrules"
-	"github.com/bcext/cashwallet/wtxmgr"
 )
 
 // confirmed checks whether a transaction at height txHeight has met minconf

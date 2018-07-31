@@ -10,11 +10,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/bcext/cashutil"
+	"github.com/bcext/cashwallet/chain"
 	"github.com/bcext/gcash/chaincfg"
 	"github.com/bcext/gcash/chaincfg/chainhash"
 	"github.com/bcext/gcash/wire"
-	"github.com/bcext/cashutil"
-	"github.com/bcext/cashwallet/chain"
 )
 
 var Block100000 = wire.MsgBlock{

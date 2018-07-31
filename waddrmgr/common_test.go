@@ -12,10 +12,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/bcext/gcash/chaincfg"
 	"github.com/bcext/cashwallet/waddrmgr"
 	"github.com/bcext/cashwallet/walletdb"
 	_ "github.com/bcext/cashwallet/walletdb/bdb"
+	"github.com/bcext/gcash/chaincfg"
 )
 
 var (

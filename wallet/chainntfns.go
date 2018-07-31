@@ -8,11 +8,11 @@ import (
 	"bytes"
 	"strings"
 
-	"github.com/bcext/gcash/txscript"
 	"github.com/bcext/cashwallet/chain"
 	"github.com/bcext/cashwallet/waddrmgr"
 	"github.com/bcext/cashwallet/walletdb"
 	"github.com/bcext/cashwallet/wtxmgr"
+	"github.com/bcext/gcash/txscript"
 )
 
 func (w *Wallet) handleChainNotifications() {

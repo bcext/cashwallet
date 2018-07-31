@@ -6,9 +6,9 @@
 package wallet
 
 import (
+	"github.com/bcext/cashwallet/walletdb"
 	"github.com/bcext/gcash/txscript"
 	"github.com/bcext/gcash/wire"
-	"github.com/bcext/cashwallet/walletdb"
 )
 
 // OutputSelectionPolicy describes the rules for selecting an output from the

@@ -1,11 +1,11 @@
 package chain
 
 import (
+	"github.com/bcext/cashutil"
+	"github.com/bcext/cashwallet/waddrmgr"
 	"github.com/bcext/gcash/chaincfg"
 	"github.com/bcext/gcash/txscript"
 	"github.com/bcext/gcash/wire"
-	"github.com/bcext/cashutil"
-	"github.com/bcext/cashwallet/waddrmgr"
 )
 
 // BlockFilterer is used to iteratively scan blocks for a set of addresses of

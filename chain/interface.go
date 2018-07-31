@@ -3,11 +3,11 @@ package chain
 import (
 	"time"
 
-	"github.com/bcext/gcash/chaincfg/chainhash"
-	"github.com/bcext/gcash/wire"
 	"github.com/bcext/cashutil"
 	"github.com/bcext/cashwallet/waddrmgr"
 	"github.com/bcext/cashwallet/wtxmgr"
+	"github.com/bcext/gcash/chaincfg/chainhash"
+	"github.com/bcext/gcash/wire"
 )
 
 // BackEnds returns a list of the available back ends.

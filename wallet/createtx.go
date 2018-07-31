@@ -10,14 +10,14 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/bcext/gcash/btcec"
-	"github.com/bcext/gcash/txscript"
-	"github.com/bcext/gcash/wire"
 	"github.com/bcext/cashutil"
 	"github.com/bcext/cashwallet/waddrmgr"
 	"github.com/bcext/cashwallet/wallet/txauthor"
 	"github.com/bcext/cashwallet/walletdb"
 	"github.com/bcext/cashwallet/wtxmgr"
+	"github.com/bcext/gcash/btcec"
+	"github.com/bcext/gcash/txscript"
+	"github.com/bcext/gcash/wire"
 )
 
 // byAmount defines the methods needed to satisify sort.Interface to

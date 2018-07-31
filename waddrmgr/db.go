@@ -11,9 +11,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/bcext/cashwallet/walletdb"
 	"github.com/bcext/gcash/chaincfg"
 	"github.com/bcext/gcash/chaincfg/chainhash"
-	"github.com/bcext/cashwallet/walletdb"
 )
 
 const (

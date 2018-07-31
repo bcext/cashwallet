@@ -7,11 +7,11 @@ package wtxmgr_test
 import (
 	"fmt"
 
+	"github.com/bcext/cashwallet/walletdb"
+	"github.com/bcext/cashwallet/wtxmgr"
 	"github.com/bcext/gcash/chaincfg"
 	"github.com/bcext/gcash/chaincfg/chainhash"
 	"github.com/bcext/gcash/wire"
-	"github.com/bcext/cashwallet/walletdb"
-	"github.com/bcext/cashwallet/wtxmgr"
 )
 
 var (

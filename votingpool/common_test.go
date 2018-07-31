@@ -10,9 +10,9 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/btcsuite/btclog"
 	"github.com/bcext/cashwallet/waddrmgr"
 	"github.com/bcext/cashwallet/walletdb"
+	"github.com/btcsuite/btclog"
 )
 
 func init() {

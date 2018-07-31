@@ -6,9 +6,9 @@
 package wallet
 
 import (
-	"github.com/bcext/gcash/chaincfg/chainhash"
 	"github.com/bcext/cashwallet/walletdb"
 	"github.com/bcext/cashwallet/wtxmgr"
+	"github.com/bcext/gcash/chaincfg/chainhash"
 )
 
 type unstableAPI struct {

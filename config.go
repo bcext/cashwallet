@@ -20,8 +20,8 @@ import (
 	"github.com/bcext/cashwallet/internal/legacy/keystore"
 	"github.com/bcext/cashwallet/netparams"
 	"github.com/bcext/cashwallet/wallet"
-	flags "github.com/jessevdk/go-flags"
 	"github.com/bcext/neutrino"
+	flags "github.com/jessevdk/go-flags"
 )
 
 const (
@@ -37,7 +37,7 @@ const (
 )
 
 var (
-	gcashDefaultCAFile  = filepath.Join(cashutil.AppDataDir("gcash", false), "rpc.cert")
+	gcashDefaultCAFile = filepath.Join(cashutil.AppDataDir("gcash", false), "rpc.cert")
 	defaultAppDataDir  = cashutil.AppDataDir("cashwallet", false)
 	defaultConfigFile  = filepath.Join(defaultAppDataDir, defaultConfigFilename)
 	defaultRPCKeyFile  = filepath.Join(defaultAppDataDir, "rpc.key")

@@ -19,9 +19,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/bcext/gcash/btcjson"
 	"github.com/bcext/cashwallet/chain"
 	"github.com/bcext/cashwallet/wallet"
+	"github.com/bcext/gcash/btcjson"
 	"github.com/btcsuite/websocket"
 )
 

@@ -9,8 +9,8 @@ import (
 	"encoding/hex"
 	"testing"
 
-	"github.com/bcext/gcash/wire"
 	. "github.com/bcext/cashwallet/wallet/internal/txsizes"
+	"github.com/bcext/gcash/wire"
 )
 
 const (

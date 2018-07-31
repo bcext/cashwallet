@@ -8,13 +8,13 @@ import (
 	"bytes"
 	"sync"
 
-	"github.com/bcext/gcash/chaincfg/chainhash"
-	"github.com/bcext/gcash/txscript"
-	"github.com/bcext/gcash/wire"
 	"github.com/bcext/cashutil"
 	"github.com/bcext/cashwallet/waddrmgr"
 	"github.com/bcext/cashwallet/walletdb"
 	"github.com/bcext/cashwallet/wtxmgr"
+	"github.com/bcext/gcash/chaincfg/chainhash"
+	"github.com/bcext/gcash/txscript"
+	"github.com/bcext/gcash/wire"
 )
 
 // TODO: It would be good to send errors during notification creation to the rpc

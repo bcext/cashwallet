@@ -3,15 +3,15 @@ package wallet
 import (
 	"time"
 
-	"github.com/bcext/gcash/chaincfg"
-	"github.com/bcext/gcash/chaincfg/chainhash"
-	"github.com/bcext/gcash/txscript"
-	"github.com/bcext/gcash/wire"
 	"github.com/bcext/cashutil"
 	"github.com/bcext/cashutil/hdkeychain"
 	"github.com/bcext/cashwallet/waddrmgr"
 	"github.com/bcext/cashwallet/walletdb"
 	"github.com/bcext/cashwallet/wtxmgr"
+	"github.com/bcext/gcash/chaincfg"
+	"github.com/bcext/gcash/chaincfg/chainhash"
+	"github.com/bcext/gcash/txscript"
+	"github.com/bcext/gcash/wire"
 )
 
 // RecoveryManager maintains the state required to recover previously used

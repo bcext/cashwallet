@@ -11,11 +11,11 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/bcext/cashutil"
 	"github.com/bcext/gcash/btcec"
 	"github.com/bcext/gcash/chaincfg"
 	"github.com/bcext/gcash/chaincfg/chainhash"
 	"github.com/bcext/gcash/txscript"
-	"github.com/bcext/cashutil"
 	"github.com/davecgh/go-spew/spew"
 )
 

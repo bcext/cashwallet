@@ -11,9 +11,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/bcext/gcash/btcec"
-	"github.com/bcext/gcash/chaincfg"
-	"github.com/bcext/gcash/wire"
 	"github.com/bcext/cashutil"
 	"github.com/bcext/cashwallet/internal/legacy/keystore"
 	"github.com/bcext/cashwallet/internal/prompt"
@@ -21,6 +18,9 @@ import (
 	"github.com/bcext/cashwallet/wallet"
 	"github.com/bcext/cashwallet/walletdb"
 	_ "github.com/bcext/cashwallet/walletdb/bdb"
+	"github.com/bcext/gcash/btcec"
+	"github.com/bcext/gcash/chaincfg"
+	"github.com/bcext/gcash/wire"
 )
 
 // networkDir returns the directory name of a network directory to hold wallet

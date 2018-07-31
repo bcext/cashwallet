@@ -25,10 +25,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 
-	"github.com/bcext/gcash/chaincfg/chainhash"
-	"github.com/bcext/gcash/rpcclient"
-	"github.com/bcext/gcash/txscript"
-	"github.com/bcext/gcash/wire"
 	"github.com/bcext/cashutil"
 	"github.com/bcext/cashutil/hdkeychain"
 	"github.com/bcext/cashwallet/chain"
@@ -39,6 +35,10 @@ import (
 	"github.com/bcext/cashwallet/waddrmgr"
 	"github.com/bcext/cashwallet/wallet"
 	"github.com/bcext/cashwallet/walletdb"
+	"github.com/bcext/gcash/chaincfg/chainhash"
+	"github.com/bcext/gcash/rpcclient"
+	"github.com/bcext/gcash/txscript"
+	"github.com/bcext/gcash/wire"
 )
 
 // Public API version constants

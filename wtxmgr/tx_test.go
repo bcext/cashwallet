@@ -14,14 +14,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/bcext/gcash/chaincfg"
-	"github.com/bcext/gcash/chaincfg/chainhash"
-	"github.com/bcext/gcash/wire"
 	"github.com/bcext/cashutil"
 	"github.com/bcext/cashwallet/walletdb"
 	_ "github.com/bcext/cashwallet/walletdb/bdb"
 	"github.com/bcext/cashwallet/wtxmgr"
 	. "github.com/bcext/cashwallet/wtxmgr"
+	"github.com/bcext/gcash/chaincfg"
+	"github.com/bcext/gcash/chaincfg/chainhash"
+	"github.com/bcext/gcash/wire"
 )
 
 // Received transaction output for mainnet outpoint

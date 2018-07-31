@@ -13,16 +13,16 @@ import (
 
 	"golang.org/x/crypto/ssh/terminal"
 
-	"github.com/bcext/gcash/btcjson"
-	"github.com/bcext/gcash/chaincfg/chainhash"
-	"github.com/bcext/gcash/rpcclient"
-	"github.com/bcext/gcash/txscript"
-	"github.com/bcext/gcash/wire"
 	"github.com/bcext/cashutil"
 	"github.com/bcext/cashwallet/internal/cfgutil"
 	"github.com/bcext/cashwallet/netparams"
 	"github.com/bcext/cashwallet/wallet/txauthor"
 	"github.com/bcext/cashwallet/wallet/txrules"
+	"github.com/bcext/gcash/btcjson"
+	"github.com/bcext/gcash/chaincfg/chainhash"
+	"github.com/bcext/gcash/rpcclient"
+	"github.com/bcext/gcash/txscript"
+	"github.com/bcext/gcash/wire"
 	"github.com/jessevdk/go-flags"
 )
 

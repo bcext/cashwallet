@@ -11,10 +11,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bcext/gcash/chaincfg"
 	"github.com/bcext/cashwallet/internal/prompt"
 	"github.com/bcext/cashwallet/waddrmgr"
 	"github.com/bcext/cashwallet/walletdb"
+	"github.com/bcext/gcash/chaincfg"
 )
 
 const (

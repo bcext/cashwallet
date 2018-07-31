@@ -9,16 +9,16 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bcext/gcash/btcjson"
-	"github.com/bcext/gcash/chaincfg"
-	"github.com/bcext/gcash/chaincfg/chainhash"
-	"github.com/bcext/gcash/rpcclient"
-	"github.com/bcext/gcash/wire"
 	"github.com/bcext/cashutil"
 	"github.com/bcext/cashutil/gcs"
 	"github.com/bcext/cashutil/gcs/builder"
 	"github.com/bcext/cashwallet/waddrmgr"
 	"github.com/bcext/cashwallet/wtxmgr"
+	"github.com/bcext/gcash/btcjson"
+	"github.com/bcext/gcash/chaincfg"
+	"github.com/bcext/gcash/chaincfg/chainhash"
+	"github.com/bcext/gcash/rpcclient"
+	"github.com/bcext/gcash/wire"
 )
 
 // RPCClient represents a persistent client connection to a bitcoin RPC server

@@ -9,10 +9,10 @@ package wallet
 import (
 	"errors"
 
-	"github.com/bcext/gcash/txscript"
 	"github.com/bcext/cashutil"
 	"github.com/bcext/cashwallet/waddrmgr"
 	"github.com/bcext/cashwallet/walletdb"
+	"github.com/bcext/gcash/txscript"
 )
 
 // MakeMultiSigScript creates a multi-signature script that can be redeemed with

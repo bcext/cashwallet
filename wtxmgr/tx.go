@@ -9,12 +9,12 @@ import (
 	"bytes"
 	"time"
 
+	"github.com/bcext/cashutil"
+	"github.com/bcext/cashwallet/walletdb"
 	"github.com/bcext/gcash/blockchain"
 	"github.com/bcext/gcash/chaincfg"
 	"github.com/bcext/gcash/chaincfg/chainhash"
 	"github.com/bcext/gcash/wire"
-	"github.com/bcext/cashutil"
-	"github.com/bcext/cashwallet/walletdb"
 )
 
 // Block contains the minimum amount of data to uniquely identify any block on

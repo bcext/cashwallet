@@ -8,9 +8,9 @@ package wallet
 import (
 	"time"
 
+	"github.com/bcext/cashutil"
 	"github.com/bcext/gcash/chaincfg/chainhash"
 	"github.com/bcext/gcash/wire"
-	"github.com/bcext/cashutil"
 )
 
 // Note: The following common types should never reference the Wallet type.
