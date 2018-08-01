@@ -159,10 +159,10 @@ func TestDepositScriptAddress(t *testing.T) {
 			reqSigs: 2,
 			pubKeys: vp.TstPubKeys[0:3],
 			addresses: map[uint32]string{
-				0: "3Hb4xcebcKg4DiETJfwjh8sF4uDw9rqtVC",
-				1: "34eVkREKgvvGASZW7hkgE2uNc1yycntMK6",
-				2: "3Qt1EaKRD9g9FeL2DGkLLswhK1AKmmXFSe",
-				3: "3PbExiaztsSYgh6zeMswC49hLUwhTQ86XG",
+				0: "bitcoincash:pzhxyrg99tjyd5gx2vgpzqfjh37ffwq38y3wm4qn5a",
+				1: "bitcoincash:pqsxukmp73sd8rrq6s9r984sfvrchk39agrl8rwq9d",
+				2: "bitcoincash:prl9ae9n36kavltv39e2769lalclzdnkh5m05nzmgs",
+				3: "bitcoincash:prcrkfu5u7w3qzjedhrw0t7xjp4cyfhh2uzt7qsx53",
 			},
 		},
 	}
@@ -177,7 +177,7 @@ func TestDepositScriptAddress(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Failed to get DepositScriptAddress #%d: %v", i, err)
 			}
-			address := addr.EncodeAddress()
+			address := addr.EncodeAddress(true)
 			if expectedAddress != address {
 				t.Errorf("DepositScript #%d returned the wrong deposit script. Got %v, want %v",
 					i, address, expectedAddress)

@@ -413,7 +413,7 @@ func serializeWithdrawal(requests []OutputRequest, startAddress WithdrawalAddres
 	dbRequests := make([]dbOutputRequest, len(requests))
 	for i, request := range requests {
 		dbRequests[i] = dbOutputRequest{
-			Addr:        request.Address.EncodeAddress(),
+			Addr:        request.Address.EncodeAddress(true),
 			Amount:      request.Amount,
 			Server:      request.Server,
 			Transaction: request.Transaction,

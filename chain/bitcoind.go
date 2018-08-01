@@ -592,7 +592,7 @@ mainLoop:
 				case []cashutil.Address:
 					c.clientMtx.Lock()
 					for _, addr := range e {
-						c.watchAddrs[addr.EncodeAddress()] =
+						c.watchAddrs[addr.EncodeAddress(true)] =
 							struct{}{}
 					}
 					c.clientMtx.Unlock()
@@ -1139,7 +1139,7 @@ func (c *BitcoindClient) filterTx(tx *wire.MsgTx,
 		}
 		for _, addr := range addrs {
 			c.clientMtx.RLock()
-			if _, ok := c.watchAddrs[addr.EncodeAddress()]; ok {
+			if _, ok := c.watchAddrs[addr.EncodeAddress(true)]; ok {
 				notifyTx = true
 				c.watchOutPoints[wire.OutPoint{
 					Hash:  tx.TxHash(),

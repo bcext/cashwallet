@@ -1774,7 +1774,7 @@ outputs:
 		_, addrs, _, _ := txscript.ExtractPkScriptAddrs(output.PkScript, net)
 		if len(addrs) == 1 {
 			addr := addrs[0]
-			address = cashutil.EncodeCashAddr(addr, net)
+			address = addr.EncodeAddress(true)
 			mgr, account, err := addrMgr.AddrAccount(addrmgrNs, addrs[0])
 			if err == nil {
 				accountName, err = mgr.AccountName(addrmgrNs, account)
@@ -2409,7 +2409,7 @@ func (w *Wallet) ListUnspent(minconf, maxconf int32,
 
 			if filter {
 				for _, addr := range addrs {
-					_, ok := addresses[cashutil.EncodeCashAddr(addr, w.ChainParams())]
+					_, ok := addresses[addr.EncodeAddress(true)]
 					if ok {
 						goto include
 					}
@@ -2464,7 +2464,7 @@ func (w *Wallet) ListUnspent(minconf, maxconf int32,
 			// addresses can be included, or removed (and the
 			// caller extracts addresses from the pkScript).
 			if len(addrs) > 0 {
-				result.Address = cashutil.EncodeCashAddr(addrs[0], w.ChainParams())
+				result.Address = addrs[0].EncodeAddress(true)
 			}
 
 			results = append(results, result)
@@ -2602,11 +2602,11 @@ func (w *Wallet) ImportPrivateKey(scope waddrmgr.KeyScope, wif *cashutil.WIF,
 		err := w.chainClient.NotifyReceived([]cashutil.Address{addr})
 		if err != nil {
 			return "", fmt.Errorf("Failed to subscribe for address ntfns for "+
-				"address %s: %s", addr.EncodeAddress(), err)
+				"address %s: %s", addr.EncodeAddress(true), err)
 		}
 	}
 
-	addrStr := addr.EncodeAddress()
+	addrStr := addr.EncodeAddress(true)
 	log.Infof("Imported payment address %s", addrStr)
 
 	w.NtfnServer.notifyAccountProperties(props)
@@ -2746,7 +2746,7 @@ func (w *Wallet) SortedActivePaymentAddresses() ([]string, error) {
 	err := walletdb.View(w.db, func(tx walletdb.ReadTx) error {
 		addrmgrNs := tx.ReadBucket(waddrmgrNamespaceKey)
 		return w.Manager.ForEachActiveAddress(addrmgrNs, func(addr cashutil.Address) error {
-			addrStrs = append(addrStrs, cashutil.EncodeCashAddr(addr, w.ChainParams()))
+			addrStrs = append(addrStrs, addr.EncodeAddress(true))
 			return nil
 		})
 	})
@@ -2963,7 +2963,7 @@ func (w *Wallet) TotalReceivedForAddr(addr cashutil.Address, minConf int32) (cas
 		syncBlock := w.Manager.SyncedTo()
 
 		var (
-			addrStr    = addr.EncodeAddress()
+			addrStr    = addr.EncodeAddress(true)
 			stopHeight int32
 		)
 
@@ -2985,7 +2985,7 @@ func (w *Wallet) TotalReceivedForAddr(addr cashutil.Address, minConf int32) (cas
 						continue
 					}
 					for _, a := range addrs {
-						if addrStr == a.EncodeAddress() {
+						if addrStr == a.EncodeAddress(true) {
 							amount += cred.Amount
 							break
 						}
@@ -3113,7 +3113,7 @@ func (w *Wallet) SignTransaction(tx *wire.MsgTx, hashType txscript.SigHashType,
 			// look up the appropriate keys and scripts by address.
 			getKey := txscript.KeyClosure(func(addr cashutil.Address) (*btcec.PrivateKey, bool, error) {
 				if len(additionalKeysByAddress) != 0 {
-					addrStr := addr.EncodeAddress()
+					addrStr := addr.EncodeAddress(true)
 					wif, ok := additionalKeysByAddress[addrStr]
 					if !ok {
 						return nil, false,
@@ -3129,7 +3129,7 @@ func (w *Wallet) SignTransaction(tx *wire.MsgTx, hashType txscript.SigHashType,
 				pka, ok := address.(waddrmgr.ManagedPubKeyAddress)
 				if !ok {
 					return nil, false, fmt.Errorf("address %v is not "+
-						"a pubkey address", address.Address().EncodeAddress())
+						"a pubkey address", address.Address().EncodeAddress(true))
 				}
 
 				key, err := pka.PrivKey()
@@ -3143,7 +3143,7 @@ func (w *Wallet) SignTransaction(tx *wire.MsgTx, hashType txscript.SigHashType,
 				// If keys were provided then we can only use the
 				// redeem scripts provided with our inputs, too.
 				if len(additionalKeysByAddress) != 0 {
-					addrStr := addr.EncodeAddress()
+					addrStr := addr.EncodeAddress(true)
 					script, ok := p2shRedeemScriptsByAddress[addrStr]
 					if !ok {
 						return nil, errors.New("no script for address")

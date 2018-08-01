@@ -39,8 +39,8 @@ func TestOutputSplittingNotEnoughInputs(t *testing.T) {
 		// These output requests will have the same server ID, so we know
 		// they'll be fulfilled in the order they're defined here, which is
 		// important for this test.
-		TstNewOutputRequest(t, 1, "34eVkREKgvvGASZW7hkgE2uNc1yycntMK6", output1Amount, net),
-		TstNewOutputRequest(t, 2, "34eVkREKgvvGASZW7hkgE2uNc1yycntMK6", output2Amount, net),
+		TstNewOutputRequest(t, 1, "bitcoincash:pqsxukmp73sd8rrq6s9r984sfvrchk39agrl8rwq9d", output1Amount, net),
+		TstNewOutputRequest(t, 2, "bitcoincash:pqsxukmp73sd8rrq6s9r984sfvrchk39agrl8rwq9d", output2Amount, net),
 	}
 	seriesID, eligible := TstCreateCreditsOnNewSeries(t, dbtx, pool, []int64{7})
 	w := newWithdrawal(0, requests, eligible, *TstNewChangeAddress(t, pool, seriesID, 0))
@@ -90,7 +90,7 @@ func TestOutputSplittingOversizeTx(t *testing.T) {
 	bigInput := int64(3)
 	smallInput := int64(2)
 	request := TstNewOutputRequest(
-		t, 1, "34eVkREKgvvGASZW7hkgE2uNc1yycntMK6", requestAmount, pool.Manager().ChainParams())
+		t, 1, "bitcoincash:pqsxukmp73sd8rrq6s9r984sfvrchk39agrl8rwq9d", requestAmount, pool.Manager().ChainParams())
 	seriesID, eligible := TstCreateCreditsOnNewSeries(t, dbtx, pool, []int64{smallInput, bigInput})
 	changeStart := TstNewChangeAddress(t, pool, seriesID, 0)
 	w := newWithdrawal(0, []OutputRequest{request}, eligible, *changeStart)
@@ -175,8 +175,8 @@ func TestWithdrawalTxOutputs(t *testing.T) {
 	// Create eligible inputs and the list of outputs we need to fulfil.
 	seriesID, eligible := TstCreateCreditsOnNewSeries(t, dbtx, pool, []int64{2e6, 4e6})
 	outputs := []OutputRequest{
-		TstNewOutputRequest(t, 1, "34eVkREKgvvGASZW7hkgE2uNc1yycntMK6", 3e6, net),
-		TstNewOutputRequest(t, 2, "3PbExiaztsSYgh6zeMswC49hLUwhTQ86XG", 2e6, net),
+		TstNewOutputRequest(t, 1, "bitcoincash:pqsxukmp73sd8rrq6s9r984sfvrchk39agrl8rwq9d", 3e6, net),
+		TstNewOutputRequest(t, 2, "bitcoincash:prcrkfu5u7w3qzjedhrw0t7xjp4cyfhh2uzt7qsx53", 2e6, net),
 	}
 	changeStart := TstNewChangeAddress(t, pool, seriesID, 0)
 
@@ -214,7 +214,7 @@ func TestFulfillRequestsNoSatisfiableOutputs(t *testing.T) {
 
 	seriesID, eligible := TstCreateCreditsOnNewSeries(t, dbtx, pool, []int64{1e6})
 	request := TstNewOutputRequest(
-		t, 1, "3Qt1EaKRD9g9FeL2DGkLLswhK1AKmmXFSe", cashutil.Amount(3e6), pool.Manager().ChainParams())
+		t, 1, "bitcoincash:prl9ae9n36kavltv39e2769lalclzdnkh5m05nzmgs", cashutil.Amount(3e6), pool.Manager().ChainParams())
 	changeStart := TstNewChangeAddress(t, pool, seriesID, 0)
 
 	w := newWithdrawal(0, []OutputRequest{request}, eligible, *changeStart)
@@ -255,11 +255,11 @@ func TestFulfillRequestsNotEnoughCreditsForAllRequests(t *testing.T) {
 	// Create eligible inputs and the list of outputs we need to fulfil.
 	seriesID, eligible := TstCreateCreditsOnNewSeries(t, dbtx, pool, []int64{2e6, 4e6})
 	out1 := TstNewOutputRequest(
-		t, 1, "34eVkREKgvvGASZW7hkgE2uNc1yycntMK6", cashutil.Amount(3e6), net)
+		t, 1, "bitcoincash:pqsxukmp73sd8rrq6s9r984sfvrchk39agrl8rwq9d", cashutil.Amount(3e6), net)
 	out2 := TstNewOutputRequest(
-		t, 2, "3PbExiaztsSYgh6zeMswC49hLUwhTQ86XG", cashutil.Amount(2e6), net)
+		t, 2, "bitcoincash:prcrkfu5u7w3qzjedhrw0t7xjp4cyfhh2uzt7qsx53", cashutil.Amount(2e6), net)
 	out3 := TstNewOutputRequest(
-		t, 3, "3Qt1EaKRD9g9FeL2DGkLLswhK1AKmmXFSe", cashutil.Amount(5e6), net)
+		t, 3, "bitcoincash:prl9ae9n36kavltv39e2769lalclzdnkh5m05nzmgs", cashutil.Amount(5e6), net)
 	outputs := []OutputRequest{out1, out2, out3}
 	changeStart := TstNewChangeAddress(t, pool, seriesID, 0)
 
@@ -422,7 +422,7 @@ func TestRollBackLastOutputInsufficientOutputs(t *testing.T) {
 	TstCheckError(t, "", err, ErrPreconditionNotMet)
 
 	output := &WithdrawalOutput{request: TstNewOutputRequest(
-		t, 1, "34eVkREKgvvGASZW7hkgE2uNc1yycntMK6", cashutil.Amount(3), &chaincfg.MainNetParams)}
+		t, 1, "bitcoincash:pqsxukmp73sd8rrq6s9r984sfvrchk39agrl8rwq9d", cashutil.Amount(3), &chaincfg.MainNetParams)}
 	tx.addOutput(output.request)
 	_, _, err = tx.rollBackLastOutput()
 	TstCheckError(t, "", err, ErrPreconditionNotMet)
@@ -444,8 +444,8 @@ func TestRollbackLastOutputWhenNewOutputAdded(t *testing.T) {
 	series, eligible := TstCreateCreditsOnNewSeries(t, dbtx, pool, []int64{5, 5})
 	requests := []OutputRequest{
 		// This is ordered by bailment ID
-		TstNewOutputRequest(t, 1, "34eVkREKgvvGASZW7hkgE2uNc1yycntMK6", 1, net),
-		TstNewOutputRequest(t, 2, "3PbExiaztsSYgh6zeMswC49hLUwhTQ86XG", 2, net),
+		TstNewOutputRequest(t, 1, "bitcoincash:pqsxukmp73sd8rrq6s9r984sfvrchk39agrl8rwq9d", 1, net),
+		TstNewOutputRequest(t, 2, "bitcoincash:prcrkfu5u7w3qzjedhrw0t7xjp4cyfhh2uzt7qsx53", 2, net),
 	}
 	changeStart := TstNewChangeAddress(t, pool, series, 0)
 
@@ -503,9 +503,9 @@ func TestRollbackLastOutputWhenNewInputAdded(t *testing.T) {
 	requests := []OutputRequest{
 		// This is manually ordered by outBailmentIDHash, which is the order in
 		// which they're going to be fulfilled by w.fulfillRequests().
-		TstNewOutputRequest(t, 1, "34eVkREKgvvGASZW7hkgE2uNc1yycntMK6", 1, net),
-		TstNewOutputRequest(t, 3, "3Qt1EaKRD9g9FeL2DGkLLswhK1AKmmXFSe", 6, net),
-		TstNewOutputRequest(t, 2, "3PbExiaztsSYgh6zeMswC49hLUwhTQ86XG", 3, net),
+		TstNewOutputRequest(t, 1, "bitcoincash:pqsxukmp73sd8rrq6s9r984sfvrchk39agrl8rwq9d", 1, net),
+		TstNewOutputRequest(t, 3, "bitcoincash:prl9ae9n36kavltv39e2769lalclzdnkh5m05nzmgs", 6, net),
+		TstNewOutputRequest(t, 2, "bitcoincash:prcrkfu5u7w3qzjedhrw0t7xjp4cyfhh2uzt7qsx53", 3, net),
 	}
 	changeStart := TstNewChangeAddress(t, pool, series, 0)
 
@@ -997,7 +997,7 @@ func TestSignMultiSigUTXORedeemScriptNotFound(t *testing.T) {
 	tx := createWithdrawalTx(t, dbtx, pool, []int64{4e6}, []int64{})
 	// This is a P2SH address for which the addr manager doesn't have the redeem
 	// script.
-	addr, _ := cashutil.DecodeAddress("3Hb4xcebcKg4DiETJfwjh8sF4uDw9rqtVC", mgr.ChainParams())
+	addr, _ := cashutil.DecodeAddress("bitcoincash:pzhxyrg99tjyd5gx2vgpzqfjh37ffwq38y3wm4qn5a", mgr.ChainParams())
 	if _, err := mgr.Address(addrmgrNs, addr); err == nil {
 		t.Fatalf("Address %s found in manager when it shouldn't", addr)
 	}
@@ -1402,7 +1402,7 @@ func createWithdrawalTxWithStoreCredits(t *testing.T, dbtx walletdb.ReadWriteTx,
 	}
 	for i, amount := range outputAmounts {
 		request := TstNewOutputRequest(
-			t, uint32(i), "34eVkREKgvvGASZW7hkgE2uNc1yycntMK6", cashutil.Amount(amount), net)
+			t, uint32(i), "bitcoincash:pqsxukmp73sd8rrq6s9r984sfvrchk39agrl8rwq9d", cashutil.Amount(amount), net)
 		tx.addOutput(request)
 	}
 	return tx

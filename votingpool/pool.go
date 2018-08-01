@@ -791,7 +791,7 @@ func (p *Pool) highestUsedIndexFor(ns walletdb.ReadBucket, seriesID uint32, bran
 
 // String returns a string encoding of the underlying bitcoin payment address.
 func (a *poolAddress) String() string {
-	return a.addr.EncodeAddress()
+	return a.addr.EncodeAddress(true)
 }
 
 func (a *poolAddress) addrIdentifier() string {

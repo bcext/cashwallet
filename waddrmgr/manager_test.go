@@ -242,9 +242,9 @@ func testAddress(tc *testContext, prefix string, gotAddr waddrmgr.ManagedAddress
 		return false
 	}
 
-	if gotAddr.Address().EncodeAddress() != wantAddr.address {
+	if gotAddr.Address().EncodeAddress(true) != wantAddr.address {
 		tc.t.Errorf("%s EncodeAddress: unexpected address - got %s, "+
-			"want %s", prefix, gotAddr.Address().EncodeAddress(),
+			"want %s", prefix, gotAddr.Address().EncodeAddress(true),
 			wantAddr.address)
 		return false
 	}
@@ -676,7 +676,7 @@ func testImportPrivateKey(tc *testContext) bool {
 			name: "wif for uncompressed pubkey address",
 			in:   "5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ",
 			expected: expectedAddr{
-				address:     "1GAehh7TsJAHuUAeKZcXf5CnwuGuGgyX2S",
+				address:     "bitcoincash:qzn96x3rn48vveny856sc7acl3zd9zq39qgcr5u4g9",
 				addressHash: hexToBytes("a65d1a239d4ec666643d350c7bb8fc44d2881128"),
 				internal:    false,
 				imported:    true,
@@ -692,7 +692,7 @@ func testImportPrivateKey(tc *testContext) bool {
 			name: "wif for compressed pubkey address",
 			in:   "KwdMAjGmerYanjeui5SHS7JkmpZvVipYvB2LJGU1ZxJwYvP98617",
 			expected: expectedAddr{
-				address:     "1LoVGDgRs9hTfTNJNuXKSpywcbdvwRXpmK",
+				address:     "bitcoincash:qrvn28wt44dc7wutlghjehy9c2q33j5nyctecw50xm",
 				addressHash: hexToBytes("d9351dcbad5b8f3b8bfa2f2cdc85c28118ca9326"),
 				internal:    false,
 				imported:    true,
@@ -845,7 +845,7 @@ func testImportScript(tc *testContext) bool {
 				"ed9493a9fc20fdb4a714808f0b680f1f1d935277" +
 				"48b5e3f629ffac"),
 			expected: expectedAddr{
-				address:     "3MbyWAu9UaoBewR3cArF1nwf4aQgVwzrA5",
+				address:     "bitcoincash:prdxu6nr9ktdc4fs67eunucpwujaqgcf8cd74ct5wp",
 				addressHash: hexToBytes("da6e6a632d96dc5530d7b3c9f3017725d023093e"),
 				internal:    false,
 				imported:    true,
@@ -866,7 +866,7 @@ func testImportScript(tc *testContext) bool {
 				"6ffefb2238af8627363bdf2ed97c1f89784a1aec" +
 				"db43384f11d2acc64443c7fc299cef0400421a53ae"),
 			expected: expectedAddr{
-				address:     "34CRZpt8j81rgh9QhzuBepqPi4cBQSjhjr",
+				address:     "bitcoincash:pqdcqr8vrl5jyghndfgzcyuma4rut9vhz5peun2far",
 				addressHash: hexToBytes("1b800cec1fe92222f36a502c139bed47c5959715"),
 				internal:    false,
 				imported:    true,

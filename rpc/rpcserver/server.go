@@ -241,7 +241,7 @@ func (s *walletServer) NextAddress(ctx context.Context, req *pb.NextAddressReque
 		return nil, translateError(err)
 	}
 
-	return &pb.NextAddressResponse{Address: addr.EncodeAddress()}, nil
+	return &pb.NextAddressResponse{Address: addr.EncodeAddress(true)}, nil
 }
 
 func (s *walletServer) ImportPrivateKey(ctx context.Context, req *pb.ImportPrivateKeyRequest) (

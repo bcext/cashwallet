@@ -119,7 +119,7 @@ func (p *Pool) getEligibleInputs(ns, addrmgrNs walletdb.ReadBucket, store *wtxmg
 	address := startAddress
 	for {
 		log.Debugf("Looking for eligible inputs at address %v", address.addrIdentifier())
-		if candidates, ok := addrMap[address.addr.EncodeAddress()]; ok {
+		if candidates, ok := addrMap[address.addr.EncodeAddress(true)]; ok {
 			var eligibles []credit
 			for _, c := range candidates {
 				candidate := newCredit(c, address)
@@ -223,7 +223,7 @@ func groupCreditsByAddr(credits []wtxmgr.Credit, chainParams *chaincfg.Params) (
 		if len(addrs) != 1 {
 			return nil, newError(ErrInputSelection, "input doesn't have exactly one address", nil)
 		}
-		encAddr := addrs[0].EncodeAddress()
+		encAddr := addrs[0].EncodeAddress(true)
 		if v, ok := addrMap[encAddr]; ok {
 			addrMap[encAddr] = append(v, c)
 		} else {

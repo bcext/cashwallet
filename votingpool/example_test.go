@@ -134,7 +134,7 @@ func Example_depositAddress() {
 		if err != nil {
 			return err
 		}
-		fmt.Println("Generated deposit address:", addr.EncodeAddress())
+		fmt.Println("Generated deposit address:", addr.EncodeAddress(true))
 		return nil
 	})
 	if err != nil {
@@ -143,7 +143,7 @@ func Example_depositAddress() {
 	}
 
 	// Output:
-	// Generated deposit address: 3QTzpc9d3tTbNLJLB7xwt87nWM38boAhAw
+	// Generated deposit address: bitcoincash:pruafy9cc8kmpt86wcewzw6u55ckjrmnhspuk2fxvz
 }
 
 // This example demonstrates how to empower a series by loading the private
@@ -207,7 +207,7 @@ func Example_startWithdrawal() {
 		}
 		defer mgr.Lock()
 
-		addr, _ := cashutil.DecodeAddress("1MirQ9bwyQcGVJPwKUgapu5ouK2E2Ey4gX", mgr.ChainParams())
+		addr, _ := cashutil.DecodeAddress("bitcoincash:qr35ennsep3hxfe7lnz5ee7j5jgmkjswssk2puzvgv", mgr.ChainParams())
 		pkScript, _ := txscript.PayToAddrScript(addr)
 		requests := []votingpool.OutputRequest{
 			{

@@ -74,7 +74,7 @@ func NewBlockFilterer(params *chaincfg.Params,
 	nExAddrs := len(req.ExternalAddrs)
 	exReverseFilter := make(map[string]waddrmgr.ScopedIndex, nExAddrs)
 	for scopedIndex, addr := range req.ExternalAddrs {
-		exReverseFilter[addr.EncodeAddress()] = scopedIndex
+		exReverseFilter[addr.EncodeAddress(true)] = scopedIndex
 	}
 
 	// Construct a reverse index by address string for the requested
@@ -82,7 +82,7 @@ func NewBlockFilterer(params *chaincfg.Params,
 	nInAddrs := len(req.InternalAddrs)
 	inReverseFilter := make(map[string]waddrmgr.ScopedIndex, nInAddrs)
 	for scopedIndex, addr := range req.InternalAddrs {
-		inReverseFilter[addr.EncodeAddress()] = scopedIndex
+		inReverseFilter[addr.EncodeAddress(true)] = scopedIndex
 	}
 
 	foundExternal := make(map[waddrmgr.KeyScope]map[uint32]struct{})
@@ -182,7 +182,7 @@ func (bf *BlockFilterer) FilterTx(tx *wire.MsgTx) bool {
 func (bf *BlockFilterer) FilterOutputAddrs(addrs []cashutil.Address) bool {
 	var isRelevant bool
 	for _, addr := range addrs {
-		addrStr := addr.EncodeAddress()
+		addrStr := addr.EncodeAddress(true)
 		if scopedIndex, ok := bf.ExReverseFilter[addrStr]; ok {
 			bf.foundExternal(scopedIndex)
 			isRelevant = true

@@ -62,7 +62,7 @@ func createWithdrawalTx(t *testing.T, dbtx walletdb.ReadWriteTx, pool *Pool, inp
 	}
 	for i, amount := range outputAmounts {
 		request := TstNewOutputRequest(
-			t, uint32(i), "34eVkREKgvvGASZW7hkgE2uNc1yycntMK6", cashutil.Amount(amount), net)
+			t, uint32(i), "bitcoincash:pqsxukmp73sd8rrq6s9r984sfvrchk39agrl8rwq9d", cashutil.Amount(amount), net)
 		tx.addOutput(request)
 	}
 	return tx
@@ -450,8 +450,8 @@ func createAndFulfillWithdrawalRequests(t *testing.T, dbtx walletdb.ReadWriteTx,
 	params := pool.Manager().ChainParams()
 	seriesID, eligible := TstCreateCreditsOnNewSeries(t, dbtx, pool, []int64{2e6, 4e6})
 	requests := []OutputRequest{
-		TstNewOutputRequest(t, 1, "34eVkREKgvvGASZW7hkgE2uNc1yycntMK6", 3e6, params),
-		TstNewOutputRequest(t, 2, "3PbExiaztsSYgh6zeMswC49hLUwhTQ86XG", 2e6, params),
+		TstNewOutputRequest(t, 1, "bitcoincash:pqsxukmp73sd8rrq6s9r984sfvrchk39agrl8rwq9d", 3e6, params),
+		TstNewOutputRequest(t, 2, "bitcoincash:prcrkfu5u7w3qzjedhrw0t7xjp4cyfhh2uzt7qsx53", 2e6, params),
 	}
 	changeStart := TstNewChangeAddress(t, pool, seriesID, 0)
 	dustThreshold := cashutil.Amount(1e4)

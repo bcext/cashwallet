@@ -592,7 +592,7 @@ func TestWatchingWalletExport(t *testing.T) {
 		return
 	}
 	for i := range newAddrs {
-		if newAddrs[i].EncodeAddress() != newWWAddrs[i].EncodeAddress() {
+		if newAddrs[i].EncodeAddress(true) != newWWAddrs[i].EncodeAddress(true) {
 			t.Errorf("Extended active addresses do not match manually requested addresses.")
 			return
 		}
@@ -615,7 +615,7 @@ func TestWatchingWalletExport(t *testing.T) {
 		return
 	}
 	for i := range newAddrs {
-		if newAddrs[i].EncodeAddress() != newWWAddrs[i].EncodeAddress() {
+		if newAddrs[i].EncodeAddress(true) != newWWAddrs[i].EncodeAddress(true) {
 			t.Errorf("Extended active addresses do not match manually requested addresses.")
 			return
 		}
@@ -903,7 +903,7 @@ func TestImportScript(t *testing.T) {
 		return
 	}
 
-	if sinfo.Address().EncodeAddress() != address.EncodeAddress() {
+	if sinfo.Address().EncodeAddress(true) != address.EncodeAddress(true) {
 		t.Error("script address doesn't match entry.")
 		return
 	}
@@ -987,7 +987,7 @@ func TestImportScript(t *testing.T) {
 	sinfo2 := ainfo2.(ScriptAddress)
 	// Check all the same again. We can't use reflect.DeepEquals since
 	// the internals have pointers back to the wallet struct.
-	if sinfo2.Address().EncodeAddress() != address.EncodeAddress() {
+	if sinfo2.Address().EncodeAddress(true) != address.EncodeAddress(true) {
 		t.Error("script address doesn't match entry.")
 		return
 	}
