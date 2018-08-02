@@ -3,7 +3,7 @@ import:
 - package: github.com/coreos/bbolt
   version: 4f5275f4ebbf6fe7cb772de987fa96ee674460a7
 - package: github.com/bcext/gcash
-  version: fdfc19097e7ac6b57035062056f5b7b4638b8898
+  version: 067de8b6c8108fb5df47ccbea453b0c6e727d5ba
   subpackages:
   - blockchain
   - btcec
@@ -14,11 +14,11 @@ import:
   - wire
 - package: github.com/btcsuite/btclog
 - package: github.com/bcext/cashutil
-  version: ab6388e0c60ae4834a1f57511e20c17b5f78be4b
+  version: 607fe08061c98889af9599009e62774092d2cf06
   subpackages:
   - hdkeychain
 - package: github.com/bcext/neutrino
-  version: 8401b99f3f0698bc6aa26c3d702dd583e51f70c2
+  version: ab0857d89115e64791a9e0d753b5d8280d8642fb
 - package: github.com/btcsuite/golangcrypto
   subpackages:
   - nacl/secretbox
