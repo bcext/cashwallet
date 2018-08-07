@@ -3060,6 +3060,12 @@ type SignatureError struct {
 	Error      error
 }
 
+// SigData hold signature needed item after SigHashForkID activated
+type SigData struct {
+	ScriptPubKey []byte
+	Amount       int64
+}
+
 // SignTransaction uses secrets of the wallet, as well as additional secrets
 // passed in by the caller, to create and add input signatures to a transaction.
 //
@@ -3070,7 +3076,7 @@ type SignatureError struct {
 //
 // The transaction pointed to by tx is modified by this function.
 func (w *Wallet) SignTransaction(tx *wire.MsgTx, hashType txscript.SigHashType,
-	additionalPrevScripts map[wire.OutPoint][]byte,
+	additionalPrevScripts map[wire.OutPoint]SigData,
 	additionalKeysByAddress map[string]*cashutil.WIF,
 	p2shRedeemScriptsByAddress map[string][]byte) ([]SignatureError, error) {
 
@@ -3089,7 +3095,6 @@ func (w *Wallet) SignTransaction(tx *wire.MsgTx, hashType txscript.SigHashType,
 		txmgrNs := dbtx.ReadBucket(wtxmgrNamespaceKey)
 
 		for i, txIn := range tx.TxIn {
-			var inputAmount int64
 			prevOutScript, ok := additionalPrevScripts[txIn.PreviousOutPoint]
 			if !ok {
 				prevHash := &txIn.PreviousOutPoint.Hash
@@ -3103,8 +3108,8 @@ func (w *Wallet) SignTransaction(tx *wire.MsgTx, hashType txscript.SigHashType,
 					return fmt.Errorf("%v not found",
 						txIn.PreviousOutPoint)
 				}
-				prevOutScript = txDetails.MsgTx.TxOut[prevIndex].PkScript
-				inputAmount = txDetails.MsgTx.TxOut[prevIndex].Value
+				prevOutScript.ScriptPubKey = txDetails.MsgTx.TxOut[prevIndex].PkScript
+				prevOutScript.Amount = txDetails.MsgTx.TxOut[prevIndex].Value
 			}
 
 			// Set up our callbacks that we pass to txscript so it can
@@ -3168,8 +3173,8 @@ func (w *Wallet) SignTransaction(tx *wire.MsgTx, hashType txscript.SigHashType,
 				txscript.SigHashSingle || i < len(tx.TxOut) {
 
 				script, err := txscript.SignTxOutput(w.ChainParams(), tx, i,
-					prevOutScript, hashType, cashutil.Amount(inputAmount), getKey,
-					getScript, txIn.SignatureScript)
+					prevOutScript.ScriptPubKey, hashType, cashutil.Amount(prevOutScript.Amount),
+					getKey, getScript, txIn.SignatureScript)
 				// Failure to sign isn't an error, it just means that
 				// the tx isn't complete.
 				if err != nil {
@@ -3187,8 +3192,8 @@ func (w *Wallet) SignTransaction(tx *wire.MsgTx, hashType txscript.SigHashType,
 			if err != nil {
 
 			}
-			vm, err := txscript.NewEngine(prevOutScript, tx, i, scriptFlags,
-				nil, nil, inputAmount)
+			vm, err := txscript.NewEngine(prevOutScript.ScriptPubKey, tx, i, scriptFlags,
+				nil, nil, prevOutScript.Amount)
 			if err == nil {
 				err = vm.Execute()
 			}

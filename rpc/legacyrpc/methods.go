@@ -1622,7 +1622,7 @@ func signRawTransaction(icmd interface{}, w *wallet.Wallet, chainClient *chain.R
 
 	// TODO: really we probably should look these up with gcash anyway to
 	// make sure that they match the blockchain if present.
-	inputs := make(map[wire.OutPoint][]byte)
+	inputs := make(map[wire.OutPoint]wallet.SigData)
 	scripts := make(map[string][]byte)
 	var cmdInputs []btcjson.RawTxInput
 	if cmd.Inputs != nil {
@@ -1635,6 +1635,11 @@ func signRawTransaction(icmd interface{}, w *wallet.Wallet, chainClient *chain.R
 		}
 
 		script, err := decodeHexStr(rti.ScriptPubKey)
+		if err != nil {
+			return nil, err
+		}
+
+		amount, err := cashutil.NewAmount(rti.Amount)
 		if err != nil {
 			return nil, err
 		}
@@ -1661,7 +1666,7 @@ func signRawTransaction(icmd interface{}, w *wallet.Wallet, chainClient *chain.R
 		inputs[wire.OutPoint{
 			Hash:  *inputHash,
 			Index: rti.Vout,
-		}] = script
+		}] = wallet.SigData{ScriptPubKey: script, Amount: int64(amount)}
 	}
 
 	// Now we go and look for any inputs that we were not provided by
@@ -1720,7 +1725,13 @@ func signRawTransaction(icmd interface{}, w *wallet.Wallet, chainClient *chain.R
 		if err != nil {
 			return nil, err
 		}
-		inputs[outPoint] = script
+
+		amount, err := cashutil.NewAmount(result.Value)
+		if err != nil {
+			return nil, err
+		}
+
+		inputs[outPoint] = wallet.SigData{ScriptPubKey: script, Amount: int64(amount)}
 	}
 
 	// All args collected. Now we can sign all the inputs that we can.

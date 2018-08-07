@@ -478,7 +478,8 @@ func (s *walletServer) SignTransaction(ctx context.Context, req *pb.SignTransact
 		return nil, translateError(err)
 	}
 
-	invalidSigs, err := s.wallet.SignTransaction(&tx, txscript.SigHashAll, nil, nil, nil)
+	invalidSigs, err := s.wallet.SignTransaction(&tx, txscript.SigHashAll|txscript.SigHashForkID,
+		nil, nil, nil)
 	if err != nil {
 		return nil, translateError(err)
 	}
