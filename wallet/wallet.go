@@ -3080,17 +3080,8 @@ func (w *Wallet) SignTransaction(tx *wire.MsgTx, hashType txscript.SigHashType,
 	additionalKeysByAddress map[string]*cashutil.WIF,
 	p2shRedeemScriptsByAddress map[string][]byte) ([]SignatureError, error) {
 
-	scriptFlags := txscript.StandardVerifyFlags
-	_, height, err := w.chainClient.GetBestBlock()
-	if err != nil {
-		return nil, errors.New("RPC request best block failed:" + err.Error())
-	}
-	if height >= w.chainParams.MonolithActivationHeight {
-		scriptFlags |= txscript.ScriptEnableMonolith
-	}
-
 	var signErrors []SignatureError
-	err = walletdb.View(w.db, func(dbtx walletdb.ReadTx) error {
+	err := walletdb.View(w.db, func(dbtx walletdb.ReadTx) error {
 		addrmgrNs := dbtx.ReadBucket(waddrmgrNamespaceKey)
 		txmgrNs := dbtx.ReadBucket(wtxmgrNamespaceKey)
 
@@ -3189,10 +3180,7 @@ func (w *Wallet) SignTransaction(tx *wire.MsgTx, hashType txscript.SigHashType,
 
 			// Either it was already signed or we just signed it.
 			// Find out if it is completely satisfied or still needs more.
-			if err != nil {
-
-			}
-			vm, err := txscript.NewEngine(prevOutScript.ScriptPubKey, tx, i, scriptFlags,
+			vm, err := txscript.NewEngine(prevOutScript.ScriptPubKey, tx, i, txscript.StandardVerifyFlags,
 				nil, nil, prevOutScript.Amount)
 			if err == nil {
 				err = vm.Execute()
