@@ -2695,6 +2695,8 @@ func (w *Wallet) resendUnminedTxs() {
 			case strings.Contains(err.Error(), "spent"):
 			case strings.Contains(err.Error(), "orphan"):
 			case strings.Contains(err.Error(), "conflict"):
+			case strings.Contains(err.Error(), "already exists"):
+			case strings.Contains(err.Error(), "negative"):
 
 			// The following errors are returned from bitcoind's
 			// mempool.

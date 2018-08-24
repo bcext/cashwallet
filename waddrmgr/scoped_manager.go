@@ -201,11 +201,17 @@ func (s *ScopedKeyManager) keyToManaged(derivedKey *hdkeychain.ExtendedKey,
 		addrType = s.addrSchema.ExternalAddrType
 	}
 
+	derivationPath := DerivationPath{
+		Account: account,
+		Branch:  branch,
+		Index:   index,
+	}
+
 	// Create a new managed address based on the public or private key
 	// depending on whether the passed key is private.  Also, zero the key
 	// after creating the managed address from it.
 	ma, err := newManagedAddressFromExtKey(
-		s, account, derivedKey, addrType,
+		s, derivationPath, derivedKey, addrType,
 	)
 	defer derivedKey.Zero()
 	if err != nil {
@@ -495,9 +501,15 @@ func (s *ScopedKeyManager) importedAddressRowToManaged(row *dbImportedAddressRow
 		return nil, managerError(ErrCrypto, str, err)
 	}
 
+	// Since this is an imported address, we won't populate the full
+	// derivation path, as we don't have enough information to do so.
+	derivationPath := DerivationPath{
+		Account: row.account,
+	}
+
 	compressed := len(pubBytes) == btcec.PubKeyBytesLenCompressed
 	ma, err := newManagedAddressWithoutPrivKey(
-		s, row.account, pubKey, compressed,
+		s, derivationPath, pubKey, compressed,
 		s.addrSchema.ExternalAddrType,
 	)
 	if err != nil {
@@ -720,12 +732,21 @@ func (s *ScopedKeyManager) nextAddresses(ns walletdb.ReadWriteBucket,
 			break
 		}
 
+		// Now that we know this key can be used, we'll create the
+		// proper derivation path so this information can be available
+		// to callers.
+		derivationPath := DerivationPath{
+			Account: account,
+			Branch:  branchNum,
+			Index:   nextIndex - 1,
+		}
+
 		// Create a new managed address based on the public or private
 		// key depending on whether the generated key is private.
 		// Also, zero the next key after creating the managed address
 		// from it.
 		addr, err := newManagedAddressFromExtKey(
-			s, account, nextKey, addrType,
+			s, derivationPath, nextKey, addrType,
 		)
 		if err != nil {
 			return nil, err
@@ -899,12 +920,21 @@ func (s *ScopedKeyManager) extendAddresses(ns walletdb.ReadWriteBucket,
 			break
 		}
 
+		// Now that we know this key can be used, we'll create the
+		// proper derivation path so this information can be available
+		// to callers.
+		derivationPath := DerivationPath{
+			Account: account,
+			Branch:  branchNum,
+			Index:   nextIndex - 1,
+		}
+
 		// Create a new managed address based on the public or private
 		// key depending on whether the generated key is private.
 		// Also, zero the next key after creating the managed address
 		// from it.
 		addr, err := newManagedAddressFromExtKey(
-			s, account, nextKey, addrType,
+			s, derivationPath, nextKey, addrType,
 		)
 		if err != nil {
 			return err
@@ -1430,17 +1460,23 @@ func (s *ScopedKeyManager) ImportPrivateKey(ns walletdb.ReadWriteBucket,
 		s.rootManager.mtx.Unlock()
 	}
 
+	// The full derivation path for an imported key is incomplete as we
+	// don't know exactly how it was derived.
+	importedDerivationPath := DerivationPath{
+		Account: ImportedAddrAccount,
+	}
+
 	// Create a new managed address based on the imported address.
 	var managedAddr *managedAddress
 	if !s.rootManager.WatchOnly() {
 		managedAddr, err = newManagedAddress(
-			s, ImportedAddrAccount, wif.PrivKey,
+			s, importedDerivationPath, wif.PrivKey,
 			wif.CompressPubKey, s.addrSchema.ExternalAddrType,
 		)
 	} else {
 		pubKey := (*btcec.PublicKey)(&wif.PrivKey.PublicKey)
 		managedAddr, err = newManagedAddressWithoutPrivKey(
-			s, ImportedAddrAccount, pubKey, wif.CompressPubKey,
+			s, importedDerivationPath, pubKey, wif.CompressPubKey,
 			s.addrSchema.ExternalAddrType,
 		)
 	}
