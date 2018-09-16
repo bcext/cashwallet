@@ -191,7 +191,8 @@ func (c *BitcoindConn) blockEventHandler(conn *gozmq.Conn) {
 				continue
 			}
 
-			log.Errorf("Unable to receive ZMQ message: %v", err)
+			log.Errorf("Unable to receive ZMQ rawblock message: %v",
+				err)
 			continue
 		}
 
@@ -225,7 +226,7 @@ func (c *BitcoindConn) blockEventHandler(conn *gozmq.Conn) {
 			// bitcoind shuts down, which will produce an unreadable
 			// event type. To prevent from logging it, we'll make
 			// sure it conforms to the ASCII standard.
-			if !isASCII(eventType) {
+			if eventType == "" || !isASCII(eventType) {
 				continue
 			}
 
@@ -266,7 +267,8 @@ func (c *BitcoindConn) txEventHandler(conn *gozmq.Conn) {
 				continue
 			}
 
-			log.Errorf("Unable to receive ZMQ message: %v", err)
+			log.Errorf("Unable to receive ZMQ rawtx message: %v",
+				err)
 			continue
 		}
 
@@ -296,6 +298,14 @@ func (c *BitcoindConn) txEventHandler(conn *gozmq.Conn) {
 			}
 			c.rescanClientsMtx.Unlock()
 		default:
+			// It's possible that the message wasn't fully read if
+			// bitcoind shuts down, which will produce an unreadable
+			// event type. To prevent from logging it, we'll make
+			// sure it conforms to the ASCII standard.
+			if eventType == "" || !isASCII(eventType) {
+				continue
+			}
+
 			log.Warnf("Received unexpected event type from rawtx "+
 				"subscription: %v", eventType)
 		}
@@ -323,15 +333,13 @@ func (c *BitcoindConn) getCurrentNet() (wire.BitcoinNet, error) {
 
 // NewBitcoindClient returns a bitcoind client using the current bitcoind
 // connection. This allows us to share the same connection using multiple
-// clients. The birthday signifies the earliest time for which we should begin
-// scanning the chain.
-func (c *BitcoindConn) NewBitcoindClient(birthday time.Time) *BitcoindClient {
+// clients.
+func (c *BitcoindConn) NewBitcoindClient() *BitcoindClient {
 	return &BitcoindClient{
 		quit: make(chan struct{}),
 
 		id: atomic.AddUint64(&c.rescanClientCounter, 1),
 
-		birthday:    birthday,
 		chainParams: c.chainParams,
 		chainConn:   c,
 

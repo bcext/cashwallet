@@ -16,6 +16,14 @@ import (
 	"sync"
 	"time"
 
+	"github.com/bcext/cashutil"
+	"github.com/bcext/cashutil/hdkeychain"
+	"github.com/bcext/cashwallet/chain"
+	"github.com/bcext/cashwallet/waddrmgr"
+	"github.com/bcext/cashwallet/wallet/txauthor"
+	"github.com/bcext/cashwallet/wallet/txrules"
+	"github.com/bcext/cashwallet/walletdb"
+	"github.com/bcext/cashwallet/wtxmgr"
 	"github.com/bcext/gcash/blockchain"
 	"github.com/bcext/gcash/btcec"
 	"github.com/bcext/gcash/btcjson"
@@ -25,15 +33,6 @@ import (
 	"github.com/bcext/gcash/txscript"
 	"github.com/bcext/gcash/wire"
 	"github.com/davecgh/go-spew/spew"
-
-	"github.com/bcext/cashutil"
-	"github.com/bcext/cashutil/hdkeychain"
-	"github.com/bcext/cashwallet/chain"
-	"github.com/bcext/cashwallet/waddrmgr"
-	"github.com/bcext/cashwallet/wallet/txauthor"
-	"github.com/bcext/cashwallet/wallet/txrules"
-	"github.com/bcext/cashwallet/walletdb"
-	"github.com/bcext/cashwallet/wtxmgr"
 )
 
 const (
@@ -174,6 +173,8 @@ func (w *Wallet) SynchronizeRPC(chainClient chain.Interface) {
 	switch cc := chainClient.(type) {
 	case *chain.NeutrinoClient:
 		cc.SetStartTime(w.Manager.Birthday())
+	case *chain.BitcoindClient:
+		cc.SetBirthday(w.Manager.Birthday())
 	}
 	w.chainClientLock.Unlock()
 
@@ -346,6 +347,13 @@ func (w *Wallet) syncWithChain() error {
 	isRecovery := w.recoveryWindow > 0
 	isInitialSync := len(addrs) == 0 && len(unspent) == 0 &&
 		startHeight == 0
+	birthday := w.Manager.Birthday()
+
+	// If an initial sync is attempted, we will try and find the block stamp
+	// of the first block past our birthday. This will be fed into the
+	// rescan to ensure we catch transactions that are sent while performing
+	// the initial sync.
+	var birthdayStamp *waddrmgr.BlockStamp
 
 	// TODO(jrick): How should this handle a synced height earlier than
 	// the chain server best block?
@@ -471,14 +479,36 @@ func (w *Wallet) syncWithChain() error {
 			}
 
 			// Check to see if this header's timestamp has surpassed
-			// our birthday. If we are in recovery mode and the
-			// check passes, we will add this block to our list of
-			// blocks to scan for recovered addresses.
+			// our birthday or if we've surpassed one previously.
 			timestamp := header.Timestamp
-			if isRecovery && timestamp.After(w.Manager.Birthday()) {
-				recoveryMgr.AddToBlockBatch(
-					hash, height, timestamp,
-				)
+			if timestamp.After(birthday) || birthdayStamp != nil {
+				// If this is the first block past our birthday,
+				// record the block stamp so that we can use
+				// this as the starting point for the rescan.
+				// This will ensure we don't miss transactions
+				// that are sent to the wallet during an initial
+				// sync.
+				//
+				// NOTE: The birthday persisted by the wallet is
+				// two days before the actual wallet birthday,
+				// to deal with potentially inaccurate header
+				// timestamps.
+				if birthdayStamp == nil {
+					birthdayStamp = &waddrmgr.BlockStamp{
+						Height:    height,
+						Hash:      *hash,
+						Timestamp: timestamp,
+					}
+				}
+
+				// If we are in recovery mode and the check
+				// passes, we will add this block to our list of
+				// blocks to scan for recovered addresses.
+				if isRecovery {
+					recoveryMgr.AddToBlockBatch(
+						hash, height, timestamp,
+					)
+				}
 			}
 
 			err = w.Manager.SetSyncedTo(ns, &waddrmgr.BlockStamp{
@@ -567,11 +597,11 @@ func (w *Wallet) syncWithChain() error {
 	// Compare previously-seen blocks against the chain server.  If any of
 	// these blocks no longer exist, rollback all of the missing blocks
 	// before catching up with the rescan.
+	rollback := false
+	rollbackStamp := w.Manager.SyncedTo()
 	err = walletdb.Update(w.db, func(tx walletdb.ReadWriteTx) error {
 		addrmgrNs := tx.ReadWriteBucket(waddrmgrNamespaceKey)
 		txmgrNs := tx.ReadWriteBucket(wtxmgrNamespaceKey)
-		rollback := false
-		rollbackStamp := w.Manager.SyncedTo()
 		for height := rollbackStamp.Height; true; height-- {
 			hash, err := w.Manager.BlockHash(addrmgrNs, height)
 			if err != nil {
@@ -595,14 +625,15 @@ func (w *Wallet) syncWithChain() error {
 			}
 			rollback = true
 		}
+
 		if rollback {
 			err := w.Manager.SetSyncedTo(addrmgrNs, &rollbackStamp)
 			if err != nil {
 				return err
 			}
-			// Rollback unconfirms transactions at and beyond the passed
-			// height, so add one to the new synced-to height to prevent
-			// unconfirming txs from the synced-to block.
+			// Rollback unconfirms transactions at and beyond the
+			// passed height, so add one to the new synced-to height
+			// to prevent unconfirming txs from the synced-to block.
 			err = w.TxStore.Rollback(txmgrNs, rollbackStamp.Height+1)
 			if err != nil {
 				return err
@@ -612,6 +643,13 @@ func (w *Wallet) syncWithChain() error {
 	})
 	if err != nil {
 		return err
+	}
+
+	// If a birthday stamp was found during the initial sync and the
+	// rollback causes us to revert it, update the birthday stamp so that it
+	// points at the new tip.
+	if birthdayStamp != nil && rollbackStamp.Height <= birthdayStamp.Height {
+		birthdayStamp = &rollbackStamp
 	}
 
 	// Request notifications for connected and disconnected blocks.
@@ -627,7 +665,7 @@ func (w *Wallet) syncWithChain() error {
 		return err
 	}
 
-	return w.Rescan(addrs, unspent)
+	return w.rescanWithTarget(addrs, unspent, birthdayStamp)
 }
 
 // defaultScopeManagers fetches the ScopedKeyManagers from the wallet using the
@@ -1435,33 +1473,62 @@ func (w *Wallet) CalculateAccountBalances(account uint32, confirms int32) (Balan
 // been used (there is at least one transaction spending to it in the
 // blockchain or gcash mempool), the next chained address is returned.
 func (w *Wallet) CurrentAddress(account uint32, scope waddrmgr.KeyScope) (cashutil.Address, error) {
+	chainClient, err := w.requireChainClient()
+	if err != nil {
+		return nil, err
+	}
+
 	manager, err := w.Manager.FetchScopedKeyManager(scope)
 	if err != nil {
 		return nil, err
 	}
 
-	var addr cashutil.Address
+	var (
+		addr  cashutil.Address
+		props *waddrmgr.AccountProperties
+	)
 	err = walletdb.Update(w.db, func(tx walletdb.ReadWriteTx) error {
 		addrmgrNs := tx.ReadWriteBucket(waddrmgrNamespaceKey)
 		maddr, err := manager.LastExternalAddress(addrmgrNs, account)
 		if err != nil {
-			// If no address exists yet, create the first external address
+			// If no address exists yet, create the first external
+			// address.
 			if waddrmgr.IsError(err, waddrmgr.ErrAddressNotFound) {
-				addr, err = w.newAddress(addrmgrNs, account, scope)
+				addr, props, err = w.newAddress(
+					addrmgrNs, account, scope,
+				)
 			}
 			return err
 		}
 
-		// Get next chained address if the last one has already been used.
+		// Get next chained address if the last one has already been
+		// used.
 		if maddr.Used(addrmgrNs) {
-			addr, err = w.newAddress(addrmgrNs, account, scope)
+			addr, props, err = w.newAddress(
+				addrmgrNs, account, scope,
+			)
 			return err
 		}
 
 		addr = maddr.Address()
 		return nil
 	})
-	return addr, err
+	if err != nil {
+		return nil, err
+	}
+
+	// If the props have been initially, then we had to create a new address
+	// to satisfy the query. Notify the rpc server about the new address.
+	if props != nil {
+		err = chainClient.NotifyReceived([]cashutil.Address{addr})
+		if err != nil {
+			return nil, err
+		}
+
+		w.NtfnServer.notifyAccountProperties(props)
+	}
+
+	return addr, nil
 }
 
 // PubKeyForAddress looks up the associated public key for a P2PKH address.
@@ -2760,69 +2827,94 @@ func (w *Wallet) SortedActivePaymentAddresses() ([]string, error) {
 
 // NewAddress returns the next external chained address for a wallet.
 func (w *Wallet) NewAddress(account uint32,
-	scope waddrmgr.KeyScope) (addr cashutil.Address, err error) {
+	scope waddrmgr.KeyScope) (cashutil.Address, error) {
 
+	chainClient, err := w.requireChainClient()
+	if err != nil {
+		return nil, err
+	}
+
+	var (
+		addr  cashutil.Address
+		props *waddrmgr.AccountProperties
+	)
 	err = walletdb.Update(w.db, func(tx walletdb.ReadWriteTx) error {
 		addrmgrNs := tx.ReadWriteBucket(waddrmgrNamespaceKey)
 		var err error
-		addr, err = w.newAddress(addrmgrNs, account, scope)
+		addr, props, err = w.newAddress(addrmgrNs, account, scope)
 		return err
 	})
-	return
+	if err != nil {
+		return nil, err
+	}
+
+	// Notify the rpc server about the newly created address.
+	err = chainClient.NotifyReceived([]cashutil.Address{addr})
+	if err != nil {
+		return nil, err
+	}
+
+	w.NtfnServer.notifyAccountProperties(props)
+
+	return addr, nil
 }
 
 func (w *Wallet) newAddress(addrmgrNs walletdb.ReadWriteBucket, account uint32,
-	scope waddrmgr.KeyScope) (cashutil.Address, error) {
+	scope waddrmgr.KeyScope) (cashutil.Address, *waddrmgr.AccountProperties, error) {
 
 	manager, err := w.Manager.FetchScopedKeyManager(scope)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// Get next address from wallet.
 	addrs, err := manager.NextExternalAddresses(addrmgrNs, account, 1)
 	if err != nil {
-		return nil, err
-	}
-
-	// Request updates from gcash for new transactions sent to this address.
-	utilAddrs := make([]cashutil.Address, len(addrs))
-	for i, addr := range addrs {
-		utilAddrs[i] = addr.Address()
-	}
-	w.chainClientLock.Lock()
-	chainClient := w.chainClient
-	w.chainClientLock.Unlock()
-	if chainClient != nil {
-		err := chainClient.NotifyReceived(utilAddrs)
-		if err != nil {
-			return nil, err
-		}
+		return nil, nil, err
 	}
 
 	props, err := manager.AccountProperties(addrmgrNs, account)
 	if err != nil {
 		log.Errorf("Cannot fetch account properties for notification "+
 			"after deriving next external address: %v", err)
-	} else {
-		w.NtfnServer.notifyAccountProperties(props)
+		return nil, nil, err
 	}
 
-	return utilAddrs[0], nil
+	return addrs[0].Address(), props, nil
 }
 
 // NewChangeAddress returns a new change address for a wallet.
-func (w *Wallet) NewChangeAddress(account uint32, scope waddrmgr.KeyScope) (addr cashutil.Address, err error) {
+func (w *Wallet) NewChangeAddress(account uint32,
+	scope waddrmgr.KeyScope) (cashutil.Address, error) {
+
+	chainClient, err := w.requireChainClient()
+	if err != nil {
+		return nil, err
+	}
+
+	var addr cashutil.Address
 	err = walletdb.Update(w.db, func(tx walletdb.ReadWriteTx) error {
 		addrmgrNs := tx.ReadWriteBucket(waddrmgrNamespaceKey)
 		var err error
 		addr, err = w.newChangeAddress(addrmgrNs, account)
 		return err
 	})
-	return
+	if err != nil {
+		return nil, err
+	}
+
+	// Notify the rpc server about the newly created address.
+	err = chainClient.NotifyReceived([]cashutil.Address{addr})
+	if err != nil {
+		return nil, err
+	}
+
+	return addr, nil
 }
 
-func (w *Wallet) newChangeAddress(addrmgrNs walletdb.ReadWriteBucket, account uint32) (cashutil.Address, error) {
+func (w *Wallet) newChangeAddress(addrmgrNs walletdb.ReadWriteBucket,
+	account uint32) (cashutil.Address, error) {
+
 	// As we're making a change address, we'll fetch the type of manager
 	// that is able to make p2wkh output as they're the most efficient.
 	scopes := w.Manager.ScopesForExternalAddrType(
@@ -2839,21 +2931,7 @@ func (w *Wallet) newChangeAddress(addrmgrNs walletdb.ReadWriteBucket, account ui
 		return nil, err
 	}
 
-	// Request updates from gcash for new transactions sent to this address.
-	utilAddrs := make([]cashutil.Address, len(addrs))
-	for i, addr := range addrs {
-		utilAddrs[i] = addr.Address()
-	}
-
-	chainClient, err := w.requireChainClient()
-	if err == nil {
-		err = chainClient.NotifyReceived(utilAddrs)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return utilAddrs[0], nil
+	return addrs[0].Address(), nil
 }
 
 // confirmed checks whether a transaction at height txHeight has met minconf
@@ -3052,7 +3130,26 @@ func (w *Wallet) SendOutputs(outputs []*wire.TxOut, account uint32,
 
 	// TODO: The record already has the serialized tx, so no need to
 	// serialize it again.
-	return chainClient.SendRawTransaction(&rec.MsgTx, false)
+	txid, err := chainClient.SendRawTransaction(&rec.MsgTx, false)
+	switch {
+	case err == nil:
+		switch w.chainClient.(type) {
+		// For neutrino we need to trigger adding relevant tx manually
+		// because for spv client - tx data isn't received from sync peer.
+		case *chain.NeutrinoClient:
+			err := walletdb.Update(w.db, func(tx walletdb.ReadWriteTx) error {
+				return w.addRelevantTx(tx, rec, nil)
+			})
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		// TODO(roasbeef): properly act on rest of mapped errors
+		return txid, nil
+	default:
+		return nil, err
+	}
 }
 
 // SignatureError records the underlying error when validating a transaction
