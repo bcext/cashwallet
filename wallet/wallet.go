@@ -320,7 +320,6 @@ func (w *Wallet) activeData(dbtx walletdb.ReadTx) ([]cashutil.Address, []wtxmgr.
 // syncWithChain brings the wallet up to date with the current chain server
 // connection.  It creates a rescan request and blocks until the rescan has
 // finished.
-//
 func (w *Wallet) syncWithChain() error {
 	chainClient, err := w.requireChainClient()
 	if err != nil {
@@ -344,9 +343,12 @@ func (w *Wallet) syncWithChain() error {
 
 	startHeight := w.Manager.SyncedTo().Height
 
+	// We'll mark this as our first sync if we don't have any unspent
+	// outputs as known by the wallet. This'll allow us to skip a full
+	// rescan at this height, and instead wait for the backend to catch up.
+	isInitialSync := len(unspent) == 0
+
 	isRecovery := w.recoveryWindow > 0
-	isInitialSync := len(addrs) == 0 && len(unspent) == 0 &&
-		startHeight == 0
 	birthday := w.Manager.Birthday()
 
 	// If an initial sync is attempted, we will try and find the block stamp
@@ -441,35 +443,30 @@ func (w *Wallet) syncWithChain() error {
 				return err
 			}
 
+			// If we're using the Neutrino backend, we can check if
+			// it's current or not. For other backends we'll assume
+			// it is current if the best height has reached the
+			// last checkpoint.
+			isCurrent := func(bestHeight int32) bool {
+				switch c := chainClient.(type) {
+				case *chain.NeutrinoClient:
+					return c.CS.IsCurrent()
+				}
+				return bestHeight >= checkHeight
+			}
+
 			// If we've found the best height the backend knows
-			// about, but we haven't reached the last checkpoint, we
-			// know the backend is still synchronizing. We can give
-			// it a little bit of time to synchronize further before
-			// updating the best height based on the backend. Once
-			// we see that the backend has advanced, we can catch
-			// up to it.
-			for height == bestHeight && bestHeight < checkHeight {
+			// about, and the backend is still synchronizing, we'll
+			// wait. We can give it a little bit of time to
+			// synchronize further before updating the best height
+			// based on the backend. Once we see that the backend
+			// has advanced, we can catch up to it.
+			for height == bestHeight && !isCurrent(bestHeight) {
 				time.Sleep(100 * time.Millisecond)
 				_, bestHeight, err = chainClient.GetBestBlock()
 				if err != nil {
 					tx.Rollback()
 					return err
-				}
-
-				// If we're using the Neutrino backend, we can
-				// check if it's current or not. If it's not and
-				// we've exceeded the original checkHeight, we
-				// can keep the loop going by increasing the
-				// checkHeight to be greater than the bestHeight
-				// and if it is, we can set checkHeight to the
-				// same as the bestHeight so the loop exits.
-				switch c := chainClient.(type) {
-				case *chain.NeutrinoClient:
-					if c.CS.IsCurrent() {
-						checkHeight = bestHeight
-					} else if checkHeight < bestHeight+1 {
-						checkHeight = bestHeight + 1
-					}
 				}
 			}
 
@@ -3082,74 +3079,24 @@ func (w *Wallet) TotalReceivedForAddr(addr cashutil.Address, minConf int32) (cas
 func (w *Wallet) SendOutputs(outputs []*wire.TxOut, account uint32,
 	minconf int32, satPerKb cashutil.Amount) (*chainhash.Hash, error) {
 
-	chainClient, err := w.requireChainClient()
-	if err != nil {
-		return nil, err
-	}
-
+	// Ensure the outputs to be created adhere to the network's consensus
+	// rules.
 	for _, output := range outputs {
-		err = txrules.CheckOutput(output, satPerKb)
-		if err != nil {
+		if err := txrules.CheckOutput(output, satPerKb); err != nil {
 			return nil, err
 		}
 	}
 
-	// Create transaction, replying with an error if the creation
-	// was not successful.
+	// Create the transaction and broadcast it to the network. The
+	// transaction will be added to the database in order to ensure that we
+	// continue to re-broadcast the transaction upon restarts until it has
+	// been confirmed.
 	createdTx, err := w.CreateSimpleTx(account, outputs, minconf, satPerKb)
 	if err != nil {
 		return nil, err
 	}
 
-	// Create transaction record and insert into the db.
-	rec, err := wtxmgr.NewTxRecordFromMsgTx(createdTx.Tx, time.Now())
-	if err != nil {
-		log.Errorf("Cannot create record for created transaction: %v", err)
-		return nil, err
-	}
-	err = walletdb.Update(w.db, func(tx walletdb.ReadWriteTx) error {
-		txmgrNs := tx.ReadWriteBucket(wtxmgrNamespaceKey)
-		err := w.TxStore.InsertTx(txmgrNs, rec, nil)
-		if err != nil {
-			return err
-		}
-
-		if createdTx.ChangeIndex >= 0 {
-			err = w.TxStore.AddCredit(txmgrNs, rec, nil, uint32(createdTx.ChangeIndex), true)
-			if err != nil {
-				log.Errorf("Error adding change address for sent "+
-					"tx: %v", err)
-				return err
-			}
-		}
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	// TODO: The record already has the serialized tx, so no need to
-	// serialize it again.
-	txid, err := chainClient.SendRawTransaction(&rec.MsgTx, false)
-	switch {
-	case err == nil:
-		switch w.chainClient.(type) {
-		// For neutrino we need to trigger adding relevant tx manually
-		// because for spv client - tx data isn't received from sync peer.
-		case *chain.NeutrinoClient:
-			err := walletdb.Update(w.db, func(tx walletdb.ReadWriteTx) error {
-				return w.addRelevantTx(tx, rec, nil)
-			})
-			if err != nil {
-				return nil, err
-			}
-		}
-
-		// TODO(roasbeef): properly act on rest of mapped errors
-		return txid, nil
-	default:
-		return nil, err
-	}
+	return w.publishTransaction(createdTx.Tx)
 }
 
 // SignatureError records the underlying error when validating a transaction
@@ -3302,9 +3249,19 @@ func (w *Wallet) SignTransaction(tx *wire.MsgTx, hashType txscript.SigHashType,
 // This function is unstable and will be removed once syncing code is moved out
 // of the wallet.
 func (w *Wallet) PublishTransaction(tx *wire.MsgTx) error {
+	_, err := w.publishTransaction(tx)
+	return err
+}
+
+// publishTransaction is the private version of PublishTransaction which
+// contains the primary logic required for publishing a transaction, updating
+// the relevant database state, and finally possible removing the transaction
+// from the database (along with cleaning up all inputs used, and outputs
+// created) if the transaction is rejected by the back end.
+func (w *Wallet) publishTransaction(tx *wire.MsgTx) (*chainhash.Hash, error) {
 	server, err := w.requireChainClient()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// As we aim for this to be general reliable transaction broadcast API,
@@ -3313,29 +3270,19 @@ func (w *Wallet) PublishTransaction(tx *wire.MsgTx) error {
 	// set of records.
 	txRec, err := wtxmgr.NewTxRecordFromMsgTx(tx, time.Now())
 	if err != nil {
-		return err
+		return nil, err
 	}
-	err = walletdb.Update(w.db, func(tx walletdb.ReadWriteTx) error {
-		txmgrNs := tx.ReadWriteBucket(wtxmgrNamespaceKey)
-		return w.TxStore.InsertTx(txmgrNs, txRec, nil)
+	err = walletdb.Update(w.db, func(dbTx walletdb.ReadWriteTx) error {
+		return w.addRelevantTx(dbTx, txRec, nil)
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	_, err = server.SendRawTransaction(tx, false)
+	txid, err := server.SendRawTransaction(tx, false)
 	switch {
 	case err == nil:
-		switch w.chainClient.(type) {
-		// For neutrino we need to trigger adding relevant tx manually
-		// because for spv client - tx data isn't received from sync peer.
-		case *chain.NeutrinoClient:
-			return walletdb.Update(w.db, func(tx walletdb.ReadWriteTx) error {
-				return w.addRelevantTx(tx, txRec, nil)
-			})
-		}
-
-		return nil
+		return txid, nil
 
 	// The following are errors returned from gcash's mempool.
 	case strings.Contains(err.Error(), "spent"):
@@ -3351,25 +3298,23 @@ func (w *Wallet) PublishTransaction(tx *wire.MsgTx) error {
 	case strings.Contains(err.Error(), "Missing inputs"):
 		fallthrough
 	case strings.Contains(err.Error(), "already in block chain"):
-
 		// If the transaction was rejected, then we'll remove it from
 		// the txstore, as otherwise, we'll attempt to continually
 		// re-broadcast it, and the utxo state of the wallet won't be
 		// accurate.
 		dbErr := walletdb.Update(w.db, func(dbTx walletdb.ReadWriteTx) error {
 			txmgrNs := dbTx.ReadWriteBucket(wtxmgrNamespaceKey)
-
 			return w.TxStore.RemoveUnminedTx(txmgrNs, txRec)
 		})
 		if dbErr != nil {
-			return fmt.Errorf("unable to broadcast tx: %v, "+
+			return nil, fmt.Errorf("unable to broadcast tx: %v, "+
 				"unable to remove invalid tx: %v", err, dbErr)
 		}
 
-		return err
+		return nil, err
 
 	default:
-		return err
+		return nil, err
 	}
 }
 

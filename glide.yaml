@@ -1,31 +1,32 @@
 package: github.com/bcext/cashwallet
 import:
-- package: github.com/coreos/bbolt
-  version: 4f5275f4ebbf6fe7cb772de987fa96ee674460a7
+- package: github.com/bcext/cashutil
+  version: 9ba6cf2922836010e02658df743533b995b0d947
+  subpackages:
+  - hdkeychain
 - package: github.com/bcext/gcash
-  version: 067de8b6c8108fb5df47ccbea453b0c6e727d5ba
+  version: fa31fe9158823126c967f080d6584601e7a69ba3
   subpackages:
   - blockchain
   - btcec
   - btcjson
   - chaincfg
   - chaincfg/chainhash
+  - rpcclient
   - txscript
   - wire
-- package: github.com/btcsuite/btclog
-- package: github.com/bcext/cashutil
-  version: 607fe08061c98889af9599009e62774092d2cf06
-  subpackages:
-  - hdkeychain
 - package: github.com/bcext/neutrino
-  version: ab0857d89115e64791a9e0d753b5d8280d8642fb
+  version: 8274e10a07b7268bfcaa54ae0ad0df9c37b0bb09
+- package: github.com/btcsuite/btclog
+- package: github.com/btcsuite/websocket
+- package: github.com/coreos/bbolt
+  version: 4f5275f4ebbf6fe7cb772de987fa96ee674460a7
 - package: github.com/btcsuite/golangcrypto
   subpackages:
   - nacl/secretbox
   - ripemd160
   - scrypt
   - ssh/terminal
-- package: github.com/btcsuite/websocket
 - package: github.com/golang/protobuf
   subpackages:
   - proto
